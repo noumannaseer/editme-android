@@ -11,7 +11,7 @@
             android:translateY="449">
             <path
                 android:pathData="M55.5 28A27.5 27.5 0 0 1 0.5 28A27.5 27.5 0 0 1 55.5 28Z"
-                android:strokeColor="#241A1A1A"
+                android:strokeColor="#000"
                 android:strokeWidth="1" />
         </group>
         <group

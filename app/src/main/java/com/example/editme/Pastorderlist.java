@@ -1,6 +1,5 @@
 package com.example.editme;
 
-import android.content.Intent;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -52,7 +51,7 @@ public class Pastorderlist extends AppCompatActivity {
             switch (item.getItemId())
             {
                 case R.id.action_news:
-                    loadFragment( new Homefragment());
+                    loadFragment( new HomeFragment());
                     return true;
                 case R.id.action_person:
                     loadFragment(new OrderFragment());

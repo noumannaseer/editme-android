@@ -12,8 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/colorPrimary"
-        app:navigationIcon="@drawable/ic_arrow_back_black_24dp"
-       >
+        app:navigationIcon="@drawable/ic_arrow_back_black_24dp">
 
         <TextView
             android:id="@+id/toolbar_title"
@@ -27,12 +26,11 @@
     </android.support.v7.widget.Toolbar>
 
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="@color/colorPrimary"
+        android:orientation="vertical"
         android:padding="12dp">
 
         <TextView
@@ -78,7 +76,7 @@
                 android:layout_marginTop="12dp"
                 android:drawableLeft="@drawable/ic_email_black_24dp"
                 android:drawablePadding="10dp"
-                android:hint="hamza@gmail.com"
+                android:hint="name@example.com"
                 android:inputType="textEmailAddress"
                 android:textSize="15dp"
 
@@ -98,7 +96,7 @@
                 android:layout_marginTop="12dp"
                 android:drawableLeft="@drawable/ic_lock_black_24dp"
                 android:drawablePadding="10dp"
-                android:hint="password"
+                android:hint="Password"
                 android:inputType="textPassword"
                 android:textSize="15dp"
 
@@ -106,11 +104,11 @@
         </LinearLayout>
 
         <Button
-            android:id="@+id/btn1"
+            android:id="@+id/btn_signup"
             android:layout_width="327dp"
             android:layout_height="48dp"
-            android:layout_gravity="center"
             android:layout_alignParentBottom="true"
+            android:layout_gravity="center"
             android:layout_marginTop="200dp"
             android:background="@drawable/buttonshape"
             android:text="SIGN UP"
@@ -125,45 +123,41 @@
 
             >
 
-            <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/facebook"
+            <ImageView android:id="@+id/facebook"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginLeft="11dp"
                 android:layout_marginTop="12dp"
-                android:src="@drawable/facebook"
-                app:civ_border_color="#FF000000"
-                app:civ_border_width="2dp" />
+                android:src="@drawable/facebook" />
 
-            <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/twitter"
+            <ImageView android:id="@+id/twitter"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="12dp"
                 android:src="@drawable/twitter"
-                app:civ_border_color="#FF000000"
-                app:civ_border_width="2dp" />
 
-            <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/googleplus"
+                />
+
+            <ImageView android:id="@+id/googleplus"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="12dp"
-                android:src="@drawable/g_"
-                app:civ_border_color="#FF000000"
-                app:civ_border_width="2dp" />
+                android:src="@drawable/g_" />
 
         </LinearLayout>
 
         <TextView
+            android:id="@+id/login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="Already have an account? LOGIN"
             android:textAlignment="center"
-            android:id="@+id/login"
             android:textSize="15sp" />
 
 
