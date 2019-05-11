@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Edit.me</string>
+    <string name="edit_me"><b>Edit.me</b></string>
+    <string name="double_the_pleasure_double_the_place_you_order">Double the Pleasure,Double the Place you order</string>
+
+    <string name="welcome"><b>Welcome</b></string>
+    <string name="welcome_to"><b>Welcome to</b></string>
+    <string name="welcome_to_edit_me_double_the_pleasure_double_the_place_your_order">Welcome to Edit me Double the Pleasure, Double the Place your order</string>
+    <string name="let_s_start">LET\'S START</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
