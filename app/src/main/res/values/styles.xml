@@ -1,19 +1,182 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/colorAccent</item>
-    </style>
-    <style name="HeaderBar">
-        <item name="android:background">#1A1A1A</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-</resources>
 
+    <style name="full_screen_alert" parent="android:Theme.Dialog">
+
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+        <!-- No backgrounds, titles or window float -->
+        <item name="android:windowBackground">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
+
+    <style name="RatingBar" parent="Theme.AppCompat">
+        <item name="colorControlNormal">@android:color/white</item>
+        <item name="colorControlActivated">@color/primaryColor</item>
+    </style>
+
+    <style name="HintInputTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/primaryColor</item>
+        <item name="colorAccent">@color/primaryColor</item>
+    </style>
+
+    <style name="InputTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/primaryColor</item>
+        <item name="android:textColorHint">@color/primaryDarkColor</item>
+        <item name="colorAccent">@color/colorPrimaryDark</item>
+        <item name="android:backgroundTint" tools:targetApi="lollipop">@color/primaryColor</item>
+    </style>
+
+    <style name="CollapsedTextStyle" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">20sp</item>
+        <!--<item name="android:fontFamily">@string/font_regular</item>-->
+    </style>
+
+    <style name="ExpandedTextStyle" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">32sp</item>
+        <!--<item name="android:fontFamily">@string/font_regular</item>-->
+    </style>
+
+    <style name="ToolbarPopup" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:background">@null</item>
+        <!--<item name="android:fontFamily">@string/font_regular</item>-->
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+    <style name="MyAlertDialogStyle" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
+
+    </style>
+
+    <style name="MyAlertDialogStyle2" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
+        <item name="android:windowNoTitle">false</item>
+        <item name="android:windowIsFloating">true</item>
+    </style>
+
+    <style name="profile_form_fields">
+        <item name="android:fontFamily" tools:targetApi="jelly_bean">sans-serif</item>
+        <item name="android:lineSpacingExtra">12sp</item>
+        <item name="android:textColor">#2196f3</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:layout_marginTop">8dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:backgroundTint" tools:ignore="NewApi">#2196f3</item>
+        <!--<item name="app:errorTextAppearance" parent="TextAppearance.AppCompat">-->
+        <!--<item name="android:textColor">#ffff0000</item>-->
+        <!--<item name="android:textColorHint">#ffff0000</item>-->
+        <!--<item name="colorAccent">#ffff0000</item>-->
+        <!--</item>-->
+
+    </style>
+
+    <style name="FontRegular">
+        <!-- Roboto Regular -->
+        <!--<item name="android:fontFamily">@string/font_regular</item>-->
+    </style>
+
+    <style name="ContactDetailNumberStyle" parent="FontRegular">
+        <item name="android:textSize">17sp</item>
+        <!--<item name="android:textAlignment">viewStart</item>-->
+        <!--<item name="android:textColor">@color/contact_detail_number_color</item>-->
+    </style>
+
+    <style name="Text20spWhiteRegular">
+        <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily" tools:targetApi="jelly_bean">sans-serif</item>
+        <item name="android:textColor">#ffffff</item>
+    </style>
+
+    <style name="customToolbarTheme" parent="Widget.AppCompat.ActionBar">
+        <item name="android:backgroundTint" tools:targetApi="lollipop">@color/primaryColor</item>
+        <item name="android:elevation" tools:ignore="NewApi">4dp</item>
+        <item name="android:layout_height">?attr/actionBarSize</item>
+        <item name="colorControlNormal">@color/primaryColor</item>
+    </style>
+
+    <style name="TextNewsItemDate">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">#757575</item>
+        <item name="android:lineSpacingExtra">2sp</item>
+    </style>
+
+    <style name="TextNewsItemTitle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#212121</item>
+        <item name="android:lineSpacingExtra">3sp</item>
+    </style>
+
+    <style name="menubarStyle" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:background">@color/primaryColor</item>
+    </style>
+
+    <style name="toolbarTextColorStyle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily" tools:targetApi="jelly_bean">sans-serif-medium</item>
+        <item name="android:textAlignment" tools:targetApi="jelly_bean_mr1">center</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:background">@null</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:letterSpacing" tools:targetApi="lollipop">0.02</item>
+        <item name="android:lineSpacingExtra">-6sp</item>
+    </style>
+
+
+    <style name="ThemeOverlay.Acrobits.ActionBar" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="android:titleTextColor" tools:ignore="NewApi">@android:color/white</item>
+        <item name="android:textColorSecondary">@color/colorAccent</item>
+        <item name="colorControlNormal">@color/primaryColor</item>
+
+    </style>
+
+
+    <!-- TextInput Layout-->
+    <style name="TextInputLayoutAppearance" parent="Widget.Design.TextInputLayout">
+        <!-- reference our hint & error styles -->
+        <!--<item name="hintTextAppearance">@style/HintText</item>-->
+        <!--<item name="errorTextAppearance">@style/ErrorText</item>-->
+        <!--<item name="android:textColor">@color/colorAccent</item>-->
+        <item name="android:textColorHint">@color/primaryColor</item>
+        <item name="colorControlNormal">@color/primaryColor</item>
+        <item name="colorControlActivated">@color/primaryColor</item>
+        <item name="colorControlHighlight">@color/primaryColor</item>
+        <item name="android:buttonTint" tools:targetApi="lollipop">@color/primaryColor</item>
+    </style>
+
+    <style name="ErrorText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/primaryColor</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <style name="HintText" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/primaryColor</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+</resources>

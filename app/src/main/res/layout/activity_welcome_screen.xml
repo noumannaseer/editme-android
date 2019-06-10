@@ -1,57 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".WelcomeActivity"
-    android:background="@android:color/white"
-    android:padding="12dp">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#1A1A1A"
-        android:text="@string/welcome_to"
-        android:textSize="30sp"
-        android:layout_marginTop="30dp"
-        android:layout_gravity="center"
-        android:textAlignment="center"
-        />
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="300dp"
-        android:src="@drawable/splash"
-        android:layout_marginTop="12dp"
-        />
+<layout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="21sp"
-        android:layout_marginTop="12sp"
-        android:textColor="#707070"
-        android:text="@string/welcome_to_edit_me_double_the_pleasure_double_the_place_your_order"
-        android:layout_gravity="center"
-        android:textAlignment="center"
-        />
-    <RelativeLayout
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="12dp">
-        <Button
-            android:layout_width="327dp"
-            android:layout_height="48dp"
-            android:id="@+id/btn"
-            android:layout_centerInParent="true"
-            android:layout_alignParentBottom="true"
-            android:background="@drawable/buttonshape"
-            android:text="@string/let_s_start"
-            android:textColor="@android:color/white"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:padding="12dp"
+        tools:context=".activities.WelcomeActivity">
 
-            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:text="@string/welcome_to"
+            android:textAlignment="center"
+            android:textColor="#1A1A1A"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="250dp"
+            android:layout_marginTop="12dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/splash" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="12sp"
+            android:text="@string/welcome_to_edit_me_double_the_pleasure_double_the_place_your_order"
+            android:textAlignment="center"
+            android:textColor="#707070"
+            android:textSize="18sp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp">
+
+            <Button
+                android:id="@+id/lets_start"
+                android:layout_width="327dp"
+                android:layout_height="48dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerInParent="true"
+                android:background="@drawable/buttonshape"
+                android:text="@string/let_s_start"
+                android:textColor="@android:color/white" />
 
 
-    </RelativeLayout>
+        </RelativeLayout>
 
-</LinearLayout>
+    </LinearLayout>
+</layout>

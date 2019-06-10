@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Edit.me</string>
     <string name="edit_me"><b>Edit.me</b></string>
+    <string name="error">Error</string>
+    <string name="ok">@android:string/ok</string>
     <string name="double_the_pleasure_double_the_place_you_order">Double the Pleasure,Double the Place you order</string>
 
     <string name="welcome"><b>Welcome</b></string>
@@ -10,4 +12,22 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="elapsed_time_days_hour">%1$d days, %2$d hours</string>
+    <string name="elapsed_hour_minutes">%1$d hours, %2$d minutes</string>
+    <string name="elapsed_time_minutes">%d minutes</string>
+    <string name="elapsed_time_secounds">%1$d seconds ago</string>
+    <string name="signup">SignUp</string>
+    <string name="sign_up_to_edit_me">Sign Up to Edit Me</string>
+    <string name="name">Name</string>
+    <string name="email_hint">name@example.com</string>
+    <string name="password">Password</string>
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="login_now">Login Now</string>
+    <string name="login">Login</string>
+    <string name="forgot_password">Forgot password ?</string>
+    <string name="login_to_edit_me">Login to Edit Me</string>
+    <string name="signup_now">Signup Now</string>
+    <string name="dont_have_an_account">Dont have an account ?</string>
+
 </resources>

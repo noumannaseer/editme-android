@@ -1,9 +1,13 @@
-package com.example.editme;
+package com.example.editme.activities;
 
-import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
+import com.example.editme.fragments.HomeFragment;
+import com.example.editme.fragments.OrderFragment;
+import com.example.editme.fragments.ProfileFragment;
+import com.example.editme.R;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
