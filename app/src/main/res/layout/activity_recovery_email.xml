@@ -1,73 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".activities.RecoveryEmailActivity">
+<layout>
 
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar1"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/colorPrimary"
-        app:navigationIcon="@drawable/ic_arrow_back_black_24dp"
-        >
-    </androidx.appcompat.widget.Toolbar>
-
-    <LinearLayout
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@color/colorPrimary"
-        android:padding="12dp"
-        >
+        tools:context=".activities.RecoveryEmailActivity">
 
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#707070"
-        android:text="We will send a reset code to your recovery email to reset your password"
-        android:textSize="24sp"
-        android:layout_marginTop="5dp"
-        android:layout_gravity="center"
-        android:textAlignment="center"
-        />
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:drawableLeft="@drawable/ic_email_black_24dp"
-        android:hint="Recovery Email"
-        android:inputType="textEmailAddress"
-        android:id="@+id/Email"
-        android:layout_marginTop="15dp"
-        android:drawablePadding="10dp"
-        android:textSize="15dp"
-
-        />
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="12dp">
-        <Button
-            android:layout_width="327dp"
-            android:layout_height="48dp"
-            android:id="@+id/btn"
-            android:layout_centerInParent="true"
-            android:layout_alignParentBottom="true"
-            android:background="@drawable/buttonshape"
-            android:text="Send Email"
-            android:textColor="@android:color/white"
-
-            />
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/AppTheme.AppBarOverlay"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
 
-    </RelativeLayout>
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/primaryColor"
+                app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
+                app:popupTheme="@style/AppTheme.PopupOverlay">
+
+                <TextView
+                    android:id="@+id/toolbar_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="@string/forgot"
+                    android:textColor="#ffffff"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+            </androidx.appcompat.widget.Toolbar>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="12dp">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                android:text="@string/recovery_email_dialog"
+                android:textAlignment="center"
+                android:textColor="#707070"
+                android:textSize="24sp" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:drawableLeft="@drawable/ic_email_black_24dp"
+                android:drawablePadding="10dp"
+                android:hint="@string/recovery_email"
+                android:inputType="textEmailAddress"
+                android:textSize="15dp"
+
+                />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="12dp">
+
+                <Button
+                    android:id="@+id/send_email"
+                    android:layout_width="327dp"
+                    android:layout_height="48dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/buttonshape"
+                    android:text="@string/send_email"
+                    android:textColor="@android:color/white"
+
+                    />
+
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
 
     </LinearLayout>
-
-
-</LinearLayout>
+</layout>

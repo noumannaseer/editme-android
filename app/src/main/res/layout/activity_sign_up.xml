@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -138,21 +138,27 @@
 
                 >
 
-                <ImageView android:id="@+id/btn_facebook"
+                <de.hdodenhof.circleimageview.CircleImageView android:id="@+id/btn_facebook"
                     xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="65dp"
                     android:layout_height="65dp"
                     android:layout_marginLeft="11dp"
                     android:layout_marginTop="12dp"
+                    android:clickable="true"
+
+                    android:foreground="?selectableItemBackground"
                     android:src="@drawable/facebook" />
 
 
-                <ImageView android:id="@+id/btn_googleplus"
+                <de.hdodenhof.circleimageview.CircleImageView android:id="@+id/btn_googleplus"
                     xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="65dp"
                     android:layout_height="65dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginTop="12dp"
+                    android:clickable="true"
+                    android:foreground="?selectableItemBackground"
+
                     android:src="@drawable/g_" />
 
             </LinearLayout>
@@ -170,7 +176,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="@string/dont_have_an_account"
+                    android:text="@string/already_have_an_account"
                     android:textAlignment="center"
                     android:textSize="15sp" />
 
