@@ -22,12 +22,31 @@
     <string name="name">Name</string>
     <string name="email_hint">name@example.com</string>
     <string name="password">Password</string>
-    <string name="already_have_an_account">Already have an account?</string>
+    <string name="already_have_an_account">Already have an account? </string>
     <string name="login_now">Login Now</string>
     <string name="login">Login</string>
     <string name="forgot_password">Forgot password ?</string>
     <string name="login_to_edit_me">Login to Edit Me</string>
     <string name="signup_now">Signup Now</string>
-    <string name="dont_have_an_account">Dont have an account ?</string>
+    <string name="dont_have_an_account">Dont have an account ? </string>
+    <string name="forgot">Forgot</string>
+    <string name="recovery_email_dialog">We will send a reset code to your recovery email to reset your password</string>
+    <string name="recovery_email">Recovery email</string>
+    <string name="send_email">Send Email</string>
+    <string name="password_length">Password at least 8 character</string>
+    <string name="required">Required</string>
+    <string name="email_format">Email is not correct.</string>
+    <string name="password_mismatch">Password mismatch</string>
+    <string name="home">Home</string>
+    <string name="order">Order</string>
+    <string name="my_orders">My Orders</string>
+    <string name="status">Status : </string>
+    <string name="order_details">Order details</string>
+    <string name="place_order">Place order</string>
+    <string name="edit_image_message">EVERYTHING YOU NEED FOR PHOTO EDITING, WITHOUT THE COMPLEX DESIGN SOFTWARE INSTALLATION</string>
+    <string name="place_your_order_now">Place your order now</string>
+    <string name="profile">Profile</string>
+    <string name="my_order_history">My order history</string>
+    <string name="older">Older</string>
 
 </resources>

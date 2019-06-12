@@ -23,7 +23,6 @@ public class SplashActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash);
         initControls();
-
     }
 
     //********************************************************************

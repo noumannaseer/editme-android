@@ -2,11 +2,14 @@ package com.example.editme.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.editme.R;
 import com.example.editme.databinding.ActivitySignUpBinding;
+import com.example.editme.utils.AndroidUtil;
+import com.example.editme.utils.UIUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -18,6 +21,9 @@ public class SignUpActivity
 {
 
     private ActivitySignUpBinding mBinding;
+    private String mName;
+    private String mEmail;
+    private String mPassword;
 
     //************************************************
     @Override
@@ -25,7 +31,7 @@ public class SignUpActivity
     //************************************************
     {
         super.onCreate(savedInstanceState);
-        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_sign_up);
+        mBinding = DataBindingUtil.setContentView(SignUpActivity.this, R.layout.activity_sign_up);
         initControls();
     }
 
@@ -46,6 +52,48 @@ public class SignUpActivity
     //***************************************************************
     {
 
+        mName = mBinding.name.getText()
+                             .toString();
+        mEmail = mBinding.email.getText()
+                               .toString();
+        mPassword = mBinding.password.getText()
+                                     .toString();
+
+
+        if (TextUtils.isEmpty(mName))
+        {
+            mBinding.name.setError(AndroidUtil.getString(R.string.required));
+            return;
+        }
+
+        if (TextUtils.isEmpty(mEmail))
+        {
+            mBinding.email.setError(AndroidUtil.getString(R.string.required));
+            return;
+        }
+
+        if (!UIUtils.isValidEmailId(mEmail))
+        {
+            mBinding.email.setError(AndroidUtil.getString(R.string.email_format));
+            return;
+        }
+
+        if (TextUtils.isEmpty(mPassword))
+        {
+            mBinding.password.setError(AndroidUtil.getString(R.string.required));
+            return;
+        }
+
+
+        if (mPassword.length() < 8)
+        {
+            mBinding.password.setError(AndroidUtil.getString(R.string.password_length));
+            return;
+        }
+
+
+        goToLoginScreen();
+
     }
 
     //************************************************
@@ -53,6 +101,7 @@ public class SignUpActivity
     //************************************************
     {
         Intent loginScreen = new Intent(SignUpActivity.this, LoginActivity.class);
+        loginScreen.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(loginScreen);
     }
 

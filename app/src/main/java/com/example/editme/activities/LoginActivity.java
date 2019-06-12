@@ -2,15 +2,15 @@ package com.example.editme.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.TextView;
 
 import com.example.editme.R;
 import com.example.editme.databinding.ActivityLoginBinding;
+import com.example.editme.utils.AndroidUtil;
+import com.example.editme.utils.UIUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 
 
@@ -21,7 +21,9 @@ public class LoginActivity
 {
 
 
-    ActivityLoginBinding mBinding;
+    private ActivityLoginBinding mBinding;
+    private String mEmail;
+    private String mPassword;
 
     //********************************************************************
     @Override
@@ -34,25 +36,92 @@ public class LoginActivity
 
     }
 
+    //**************************************************************
     private void initControls()
+    //**************************************************************
     {
+
         setSupportActionBar(mBinding.toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        mBinding.btnSignupNow.setOnClickListener(view -> gotoSignUpScreen());
+        mBinding.login.setOnClickListener(view -> loginUser());
+        mBinding.forgotPassword.setOnClickListener(view -> gotoForgotPasswordScreen());
     }
 
-    private void gotosignup()
+    //**************************************************************
+    private void loginUser()
+    //**************************************************************
     {
-        Intent SignUPScreen = new Intent(LoginActivity.this, SignUpActivity.class);
-        startActivity(SignUPScreen);
+
+        mEmail = mBinding.loginEmail.getText()
+                                    .toString();
+        mPassword = mBinding.password.getText()
+                                     .toString();
+
+
+        if (TextUtils.isEmpty(mEmail))
+        {
+            mBinding.loginEmail.setError(AndroidUtil.getString(R.string.required));
+            return;
+        }
+
+        if (!UIUtils.isValidEmailId(mEmail))
+        {
+            mBinding.loginEmail.setError(AndroidUtil.getString(R.string.email_format));
+            return;
+        }
+
+        if (TextUtils.isEmpty(mPassword))
+        {
+            mBinding.password.setError(AndroidUtil.getString(R.string.required));
+            return;
+        }
+
+
+        if (mPassword.length() < 8)
+        {
+            mBinding.password.setError(AndroidUtil.getString(R.string.password_length));
+            return;
+        }
+
+
+        gotoHomeScreen();
+
     }
 
-    private void gotoRecoveryscreen()
+    //**************************************************************
+    private void gotoHomeScreen()
+    //**************************************************************
+    {
+        Intent homeIntent = new Intent(this, HomeActivity.class);
+        homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(homeIntent);
+
+    }
+
+    //**************************************************************
+    private void gotoSignUpScreen()
+    //**************************************************************
+    {
+        Intent signUpIntent = new Intent(LoginActivity.this, SignUpActivity.class);
+        signUpIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(signUpIntent);
+        finish();
+    }
+
+
+    //**************************************************************
+    private void gotoForgotPasswordScreen()
+    //**************************************************************
     {
         Intent recoveryScreen = new Intent(LoginActivity.this, RecoveryEmailActivity.class);
         startActivity(recoveryScreen);
     }
 
+
+    //**************************************************************
     public boolean onOptionsItemSelected(MenuItem item)
+    //**************************************************************
     {
         switch (item.getItemId())
         {
