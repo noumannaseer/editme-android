@@ -1,14 +1,13 @@
 package com.example.editme.adapters;
 
+import android.app.Activity;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.editme.R;
-import com.example.editme.databinding.ListViewImagesBinding;
-import com.example.editme.utils.AndroidUtil;
-import com.example.editme.utils.UIUtils;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.FirebaseStorage;
+import com.example.editme.databinding.ListViewEditImagesBinding;
+import com.example.editme.model.EditImage;
 
 import java.util.List;
 
@@ -24,15 +23,19 @@ public class AddImagesCustomAdapter
 {
 
 
-    private List<String> mImagesList;
+    private List<EditImage> mImagesList;
     private ImageClickListener mImageClickListener;
+    private boolean mShowDeleteIcon;
+    private Activity mActivity;
 
     //**********************************************
-    public AddImagesCustomAdapter(List<String> imagesList, ImageClickListener imageClickListener)
+    public AddImagesCustomAdapter(List<EditImage> imagesList, ImageClickListener imageClickListener, boolean showDeleteIcon, Activity activity)
     //**********************************************
     {
         mImagesList = imagesList;
         mImageClickListener = imageClickListener;
+        mShowDeleteIcon = showDeleteIcon;
+        mActivity = activity;
 
     }
 
@@ -60,8 +63,8 @@ public class AddImagesCustomAdapter
     public ViewHolder onCreateViewHolder(@androidx.annotation.NonNull ViewGroup parent, int viewType)
     //**********************************************
     {
-        ListViewImagesBinding mBinding = DataBindingUtil.inflate(
-                LayoutInflater.from(parent.getContext()), R.layout.list_view_images, parent,
+        ListViewEditImagesBinding mBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(parent.getContext()), R.layout.list_view_edit_images, parent,
                 false);
         ViewHolder holder = new ViewHolder(
                 mBinding);
@@ -75,23 +78,24 @@ public class AddImagesCustomAdapter
     {
         final val item = mImagesList
                 .get(position);
-        UIUtils.loadImages(item, holder.mBinding.addImage,
-                           AndroidUtil.getDrawable(R.drawable.buttonshape));
 
-    }
+        holder.mBinding.addImage.setImageDrawable(item.getImageDrawable(mActivity));
+        holder.mBinding.description.setText(item.getDescription());
 
-    private void deleteImageFromFireBase(int position)
-    {
-        val deleteReference = FirebaseStorage.getInstance()
-                                             .getReferenceFromUrl(mImagesList.get(position));
-        deleteReference.delete()
-                       .addOnSuccessListener(new OnSuccessListener<Void>()
-                       {
-                           @Override
-                           public void onSuccess(Void aVoid)
-                           {
-                           }
-                       });
+        holder.mBinding.addImageMainView.setOnClickListener(view -> {
+            if (mImageClickListener != null)
+                mImageClickListener.onImageClick(position);
+        });
+
+        if (!mShowDeleteIcon)
+            holder.mBinding.remove.setVisibility(View.GONE);
+        else
+            holder.mBinding.remove.setOnClickListener(view -> {
+                if (mImageClickListener != null)
+                    mImageClickListener.onImageDelete(position);
+
+            });
+
     }
 
 
@@ -108,10 +112,10 @@ public class AddImagesCustomAdapter
             extends RecyclerView.ViewHolder
             //**********************************************
     {
-        ListViewImagesBinding mBinding;
+        ListViewEditImagesBinding mBinding;
 
         //**********************************************
-        public ViewHolder(@NonNull ListViewImagesBinding itemView)
+        public ViewHolder(@NonNull ListViewEditImagesBinding itemView)
         //**********************************************
         {
             super(itemView.getRoot());
@@ -124,7 +128,7 @@ public class AddImagesCustomAdapter
     public interface ImageClickListener
             //******************************************************************
     {
-        void onAddImageClick();
+        void onImageClick(int index);
 
         void onImageDelete(int index);
 

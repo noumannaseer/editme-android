@@ -2,47 +2,52 @@ package com.example.editme.fragments;
 
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.azoft.carousellayoutmanager.CarouselLayoutManager;
-import com.azoft.carousellayoutmanager.CarouselZoomPostLayoutListener;
-import com.azoft.carousellayoutmanager.CenterScrollListener;
 import com.example.editme.R;
-import com.example.editme.adapters.AddImagesCustomAdapter;
+import com.example.editme.activities.HomeActivity;
+import com.example.editme.adapters.CircularImageSliderAdapter;
 import com.example.editme.databinding.FragmentPackagesBinding;
+import com.example.editme.model.PackagesDetails;
+import com.example.editme.utils.UIUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.fragment.app.Fragment;
+import lombok.val;
+
 /**
  * A simple {@link Fragment} subclass.
  */
+
+//*********************************************************************
 public class PackagesFragment
         extends Fragment
+        implements CircularImageSliderAdapter.CircularSliderListener
+//*********************************************************************
 {
 
-    FragmentPackagesBinding mBinding;
 
+    //*********************************************************************
     public PackagesFragment()
+    //*********************************************************************
     {
         // Required empty public constructor
     }
 
-
+    private FragmentPackagesBinding mBinding;
     private View mRootView;
     private List<String> mUrlList;
 
 
+    //*********************************************************************
     @Override
-
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
+    //*********************************************************************
     {
         if (mRootView == null)
         {
@@ -53,31 +58,51 @@ public class PackagesFragment
         return mRootView;
     }
 
+    //*********************************************************************
     private void initControls()
+    //*********************************************************************
     {
-        mUrlList = new ArrayList<>();
-        mUrlList.add(
-                "https://images.pexels.com/photos/462118/pexels-photo-462118.jpeg?auto=format%2Ccompress&cs=tinysrgb&dpr=1&w=500");
-        mUrlList.add(
-                "https://images.pexels.com/photos/257360/pexels-photo-257360.jpeg?auto=format%2Ccompress&cs=tinysrgb&dpr=1&w=500");
-
-        mUrlList.add("https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__340.jpg");
-        mUrlList.add(
-                "https://images.unsplash.com/photo-1535498730771-e735b998cd64?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80");
-        startPackageSlider();
+        initData();
+        mBinding.packagesPrice.setOnClickListener(view -> {
+            UIUtils.testToast(false, "Package bu successfull");
+            UIUtils.setPackageStatus(true);
+            ((HomeActivity)getActivity()).loadFragment(new OrderFragment());
+        });
     }
 
-    private void startPackageSlider()
-    {
-        // vertical and cycle layout
-        final CarouselLayoutManager layoutManager = new CarouselLayoutManager(
-                CarouselLayoutManager.VERTICAL, true);
-        layoutManager.setPostLayoutListener(new CarouselZoomPostLayoutListener());
+    List<PackagesDetails> lstImages;
 
-        mBinding.recyclerView.setLayoutManager(layoutManager);
-        mBinding.recyclerView.setHasFixedSize(true);
-        mBinding.recyclerView.setAdapter(new AddImagesCustomAdapter(mUrlList, null));
-        mBinding.recyclerView.addOnScrollListener(new CenterScrollListener());
+    //*********************************************************************
+    private void initData()
+    //*********************************************************************
+
+    {
+        lstImages = new ArrayList<>();
+
+        lstImages.add(
+                new PackagesDetails("Package 1", "package 1 descrption", 150, R.drawable.cyclos));
+        lstImages.add(
+                new PackagesDetails("Package 2", "package 2 descrption", 250, R.drawable.night));
+        lstImages.add(
+                new PackagesDetails("Package 3", "package 3 descrption", 300, R.drawable.meggan));
+
+
+        CircularImageSliderAdapter adapter = new CircularImageSliderAdapter(lstImages,
+                                                                            getActivity(),
+                                                                            PackagesFragment.this);
+        mBinding.horizontalCycle.setAdapter(adapter);
     }
 
+
+    //*********************************************************************
+    @Override
+    public void onImageSlide(int position)
+    //*********************************************************************
+    {
+        val packagesDetail = lstImages.get(position);
+        mBinding.packageName.setText(packagesDetail.getPackageName());
+        mBinding.packagesDetail.setText(packagesDetail.getPackageDescription());
+        mBinding.packagesPrice.setText("$" + packagesDetail.getPrice());
+
+    }
 }

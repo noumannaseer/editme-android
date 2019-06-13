@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -15,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.editme.R;
@@ -28,6 +31,7 @@ import java.util.Random;
 import java.util.regex.Pattern;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.UiThread;
 import lombok.NonNull;
 import lombok.val;
 
@@ -41,9 +45,31 @@ public class UIUtils
 
     public static final String USER_REMEMBER = "USER_REMEMBER";
     public static final String USER_NAME = "USER_NAME";
-    public static final String PREF_KEY_FILE_NAME = "messages39";
+    public static final String PREF_KEY_FILE_NAME = "editme";
     public static final String INTRO_LOADED = "INTRO_LOADED";
     public static final String CURRENT_LANGUAGE = "CURRENT_LANGUAGE";
+    public static final String PACKAGE_STATUS = "PACKAGE_STATUS";
+
+
+    public static void setPackageStatus(boolean status)
+    {
+        SharedPreferences sharedPreferences = getApplicationContext()
+                .getSharedPreferences(PREF_KEY_FILE_NAME,
+                                      MODE_PRIVATE);
+        // Writing data to SharedPreferences
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(PACKAGE_STATUS, status);
+    }
+
+    public static boolean getPackageStatus()
+    {
+        SharedPreferences sharedPreferences = getApplicationContext()
+                .getSharedPreferences(PREF_KEY_FILE_NAME,
+                                      MODE_PRIVATE);
+        boolean value = sharedPreferences.getBoolean(PACKAGE_STATUS, false);
+        return value;
+
+    }
 
 
     //****************************************************************
@@ -200,9 +226,6 @@ public class UIUtils
     }
 
 
-
-
-
     //*********************************************************************
     public static void handleFailure(Throwable t, Context context)
     //*********************************************************************
@@ -275,7 +298,6 @@ public class UIUtils
         }
         return outputStream.toString();
     }
-
 
 
     //******************************************************************
@@ -386,8 +408,6 @@ public class UIUtils
     }
 
 
-
-
     public static String getPostedTime(long previousTime)
     {
 
@@ -449,8 +469,11 @@ public class UIUtils
     }
 
 
-    public static void showSnackBar(@NonNull View view, @NonNull String message)
+    public static void showSnackBar(@NonNull Activity activity, @NonNull String message)
     {
+        val view = activity.getWindow()
+                           .getDecorView()
+                           .getRootView();
         Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
                 .show();
     }
@@ -458,6 +481,66 @@ public class UIUtils
     public interface CheckBoxSingleItemListener
     {
         void onItemSelected(int itemIndex);
+    }
+
+    public static String getAppVersion()
+    {
+        try
+        {
+            PackageInfo pInfo = AndroidUtil.getApplicationContext()
+                                           .getPackageManager()
+                                           .getPackageInfo(AndroidUtil.getApplicationContext()
+                                                                      .getPackageName(), 0);
+            String version = pInfo.versionName;
+
+            return version;
+        }
+        catch (PackageManager.NameNotFoundException e)
+        {
+            e.printStackTrace();
+            return "0";
+        }
+
+    }
+
+    //*********************************************************************
+    public static String getAppVersionString()
+    //*********************************************************************
+    {
+        try
+        {
+            PackageInfo pInfo = AndroidUtil.getApplicationContext()
+                                           .getPackageManager()
+                                           .getPackageInfo(AndroidUtil.getApplicationContext()
+                                                                      .getPackageName(), 0);
+            String version = pInfo.versionName;
+
+            return AndroidUtil.getString(R.string.app_version, version);
+        }
+        catch (PackageManager.NameNotFoundException e)
+        {
+            e.printStackTrace();
+            return AndroidUtil.getString(R.string.app_version, "");
+        }
+    }
+
+    /**
+     * Toast a message.
+     *
+     * @param longToast Should the toast be a long one?
+     * @param message   Message to toast.
+     */
+    //******************************************************************
+    @UiThread
+    public static void testToast(boolean longToast,
+                                 @NonNull String message)
+    //******************************************************************
+    {
+
+        Toast
+                .makeText(AndroidUtil.getApplicationContext(), message,
+                          longToast ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT)
+                .show();
     }
 
 }
