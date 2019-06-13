@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.editme.R;
+import com.example.editme.fragments.HomeFragment;
 import com.example.editme.utils.AndroidUtil;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,6 +32,8 @@ public class SplashActivity
     {
         gotoWelcomeScreen();
     }
+
+    String[] a = new String[] { "sas", "sasa", "sasas", "sasasa" };
 
     //********************************************************************
     private void gotoWelcomeScreen()

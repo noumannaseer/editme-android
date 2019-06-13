@@ -11,6 +11,7 @@ import com.example.editme.fragments.HomeFragment;
 import com.example.editme.fragments.OrderFragment;
 import com.example.editme.fragments.PackagesFragment;
 import com.example.editme.fragments.ProfileFragment;
+import com.example.editme.utils.UIUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -53,30 +54,9 @@ public class HomeActivity
                 mOnNavigationItemSelectedListener);
     }
 
-    //****************************************************************
-    public boolean onCreateOptionsMenu(Menu menu)
-    //****************************************************************
-    {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.postorderlist, menu);
-        return true;
-    }
 
     //****************************************************************
-    public boolean onOptionsItemSelected(MenuItem item)
-    //****************************************************************
-    {
-        if (item.getItemId() == R.id.action_settings)
-        {
-            //  Intent setting = new Intent(HomeActivity.this, Setting_Screen.class);
-            //startActivity(setting);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    //****************************************************************
-    private void loadFragment(Fragment fragment)
+    public void loadFragment(Fragment fragment)
     //****************************************************************
     {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -99,7 +79,10 @@ public class HomeActivity
                 loadFragment(mHomeFragment);
                 return true;
             case R.id.action_orders:
-                loadFragment(mOrderFragment);
+                if (!UIUtils.getPackageStatus())
+                    loadFragment(new PackagesFragment());
+                else
+                    loadFragment(mOrderFragment);
                 return true;
             case R.id.action_profile:
                 loadFragment(mProfileFragment);

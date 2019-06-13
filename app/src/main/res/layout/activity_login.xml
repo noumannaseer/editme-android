@@ -143,7 +143,6 @@
                     android:layout_marginTop="12dp"
 
                     android:clickable="true"
-                    android:foreground="?selectableItemBackground"
                     android:src="@drawable/facebook" />
 
 
@@ -155,7 +154,6 @@
 
                     android:layout_marginTop="12dp"
                     android:clickable="true"
-                    android:foreground="?selectableItemBackground"
                     android:src="@drawable/g_" />
 
             </LinearLayout>
