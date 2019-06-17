@@ -40,7 +40,7 @@ public class SplashActivity
     //********************************************************************
     {
         AndroidUtil.handler.postDelayed(() -> {
-            Intent homeIntent = new Intent(SplashActivity.this, WelcomeActivity.class);
+            Intent homeIntent = new Intent(SplashActivity.this, HomeActivity.class);
             startActivity(homeIntent);
             finish();
         }, SPLASH_TIME_OUT);

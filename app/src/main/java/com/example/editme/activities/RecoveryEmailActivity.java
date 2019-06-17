@@ -4,11 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
+import android.view.View;
 
+import com.example.editme.EditMe;
 import com.example.editme.R;
 import com.example.editme.databinding.ActivityRecoveryEmailBinding;
 import com.example.editme.utils.AndroidUtil;
 import com.example.editme.utils.UIUtils;
+import com.google.android.gms.tasks.Task;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -70,8 +73,30 @@ public class RecoveryEmailActivity
             mBinding.email.setError(AndroidUtil.getString(R.string.email_format));
             return;
         }
+        mBinding.progressView.setVisibility(View.VISIBLE);
+        EditMe.instance()
+              .getMAuth()
+              .sendPasswordResetEmail(mEmail)
+              .addOnCompleteListener((Task<Void> task) ->
+                                     {
 
-        gotoLoginScreen();
+                                         mBinding.progressBar.setVisibility(View.GONE);
+                                         if (task.isSuccessful())
+                                         {
+                                             UIUtils.displayAlertDialog(
+                                                     AndroidUtil.getString(
+                                                             R.string.email_sent), null,
+                                                     RecoveryEmailActivity.this);
+                                             super.onBackPressed();
+
+                                         }
+                                         else
+                                             UIUtils.displayAlertDialog(task.getException()
+                                                                            .getLocalizedMessage()
+                                                                            .toString(),
+                                                                        null,
+                                                                        RecoveryEmailActivity.this);
+                                     });
     }
 
     private void gotoLoginScreen()

@@ -2,7 +2,13 @@ package com.example.editme.fragments;
 
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -10,13 +16,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.esafirm.imagepicker.features.ImagePicker;
+import com.esafirm.imagepicker.features.ReturnMode;
+import com.esafirm.imagepicker.model.Image;
 import com.example.editme.R;
 import com.example.editme.activities.SettingsActivity;
 import com.example.editme.databinding.FragmentProfileBinding;
+import com.example.editme.model.EditImage;
+import com.example.editme.utils.AndroidUtil;
+
+import java.io.File;
+import java.io.IOException;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import lombok.val;
 
 
 /**
@@ -40,6 +55,7 @@ public class ProfileFragment
 
     private FragmentProfileBinding mBinding;
     private View mRootView;
+    private Uri mImageIntentURI;
 
 
     //*********************************************************************
@@ -66,9 +82,73 @@ public class ProfileFragment
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity)getActivity()).getSupportActionBar()
                                           .setDisplayShowTitleEnabled(false);
+        mBinding.profileImage.setOnClickListener(view -> showImageDialog());
 
     }
 
+
+    //**********************************************
+    public void showImageDialog()
+    //**********************************************
+    {
+
+        try
+        {
+            ImagePicker.create(this)
+                       .returnMode(ReturnMode.ALL)
+                       .toolbarFolderTitle(AndroidUtil.getString(R.string.select_profile))
+                       .toolbarArrowColor(Color.WHITE)
+                       .theme(getActivity().getPackageManager()
+                                           .getActivityInfo(getActivity().getComponentName(), 0)
+                                           .getThemeResource())
+                       .single()
+                       .toolbarImageTitle(AndroidUtil.getString(R.string.select_profile))
+                       .showCamera(true)
+                       .includeVideo(false)
+                       //.theme(getTheme())
+                       .enableLog(true)
+                       .start();
+
+        }
+        catch (PackageManager.NameNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+
+    }
+
+    //**************************************************************************
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    //**************************************************************************
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (ImagePicker.shouldHandle(requestCode, resultCode, data))
+        {
+            Image image = ImagePicker.getFirstImageOrNull(data);
+            mImageIntentURI = data.getData();
+            if (image != null)
+            {
+                mImageIntentURI = Uri.fromFile(new File(image.getPath()));
+                try
+                {
+                    val bitmap = MediaStore.Images.Media.getBitmap(
+                            getActivity().getContentResolver(),
+                            mImageIntentURI);
+                    Drawable d = new BitmapDrawable(getResources(), bitmap);
+                    mBinding.profileImage.setImageDrawable(d);
+                    //showDataOnRecyclerView();
+
+
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+
+    }
 
     //******************************************************************
     @Override

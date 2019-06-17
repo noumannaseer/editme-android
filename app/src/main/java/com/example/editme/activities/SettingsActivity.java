@@ -43,14 +43,17 @@ public class SettingsActivity
     {
 
         setTab();
-        mBinding.logoutLayout.setOnClickListener(view -> logoutUser());
         mBinding.aboutUsLayout.setOnClickListener(view -> openAboutDialog());
         mBinding.privacyPolicyLayout.setOnClickListener(view -> gotoBrowserActivity());
         mBinding.userNameLayout.setOnClickListener(view -> gotoUpdateNameScreen(false));
         mBinding.emailLayout.setOnClickListener(view -> gotoUpdateNameScreen(true));
         mBinding.changePasswordLayout.setOnClickListener(view -> gotoUpdatePasswordScreen());
-        mBinding.paymentsLayout.setOnClickListener(
-                view -> UIUtils.testToast(false, "Package is not subscribed"));
+        mBinding.paymentsLayout.setOnClickListener(view ->
+                                                   {
+                                                       UIUtils.testToast(false,
+                                                                         "Package is not subscribed");
+                                                   });
+        mBinding.logoutLayout.setOnClickListener(view -> logoutUser());
 
     }
 
