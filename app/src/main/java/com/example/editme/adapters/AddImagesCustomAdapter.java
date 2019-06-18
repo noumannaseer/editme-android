@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 
 import com.example.editme.R;
 import com.example.editme.databinding.ListViewEditImagesBinding;
+import com.example.editme.databinding.ListViewOrderImagesBinding;
 import com.example.editme.model.EditImage;
 
 import java.util.List;
@@ -63,8 +64,8 @@ public class AddImagesCustomAdapter
     public ViewHolder onCreateViewHolder(@androidx.annotation.NonNull ViewGroup parent, int viewType)
     //**********************************************
     {
-        ListViewEditImagesBinding mBinding = DataBindingUtil.inflate(
-                LayoutInflater.from(parent.getContext()), R.layout.list_view_edit_images, parent,
+        ListViewOrderImagesBinding mBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(parent.getContext()), R.layout.list_view_order_images, parent,
                 false);
         ViewHolder holder = new ViewHolder(
                 mBinding);
@@ -112,10 +113,10 @@ public class AddImagesCustomAdapter
             extends RecyclerView.ViewHolder
             //**********************************************
     {
-        ListViewEditImagesBinding mBinding;
+        ListViewOrderImagesBinding mBinding;
 
         //**********************************************
-        public ViewHolder(@NonNull ListViewEditImagesBinding itemView)
+        public ViewHolder(@NonNull ListViewOrderImagesBinding itemView)
         //**********************************************
         {
             super(itemView.getRoot());

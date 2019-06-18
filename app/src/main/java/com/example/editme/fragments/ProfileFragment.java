@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,11 +20,13 @@ import android.view.ViewGroup;
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.features.ReturnMode;
 import com.esafirm.imagepicker.model.Image;
+import com.example.editme.EditMe;
 import com.example.editme.R;
 import com.example.editme.activities.SettingsActivity;
 import com.example.editme.databinding.FragmentProfileBinding;
 import com.example.editme.model.EditImage;
 import com.example.editme.utils.AndroidUtil;
+import com.example.editme.utils.UIUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,7 +85,29 @@ public class ProfileFragment
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity)getActivity()).getSupportActionBar()
                                           .setDisplayShowTitleEnabled(false);
-        mBinding.profileImage.setOnClickListener(view -> showImageDialog());
+
+        val user = EditMe.instance()
+                         .getMAuth()
+                         .getCurrentUser();
+
+        if (user != null && !TextUtils.isEmpty(user.getDisplayName()) && !TextUtils.isEmpty(
+                user.getPhotoUrl()
+                    .toString()))
+        {
+
+            UIUtils.loadImages(user.getPhotoUrl()
+                                   .toString(), mBinding.profileImage,
+                               AndroidUtil.getDrawable(R.drawable.ic_person_black_24dp));
+            mBinding.userName.setText(user.getDisplayName());
+
+        }
+        else
+        {
+            mBinding.profileImage.setOnClickListener(view -> showImageDialog());
+            mBinding.profileImage.setImageDrawable(
+                    AndroidUtil.getDrawable(R.drawable.ic_person_black_24dp));
+            mBinding.userName.setText("username");
+        }
 
     }
 

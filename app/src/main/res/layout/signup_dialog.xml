@@ -120,8 +120,9 @@
                         android:layout_marginLeft="11dp"
                         android:layout_marginTop="12dp"
                         android:clickable="true"
+                        android:src="@drawable/facebook"
 
-                        android:src="@drawable/facebook" />
+                        android:visibility="gone" />
 
                     <com.facebook.login.widget.LoginButton
                         android:id="@+id/facebook_login"
@@ -140,8 +141,8 @@
                         android:layout_marginLeft="20dp"
                         android:layout_marginTop="12dp"
                         android:clickable="true"
-
-                        android:src="@drawable/g_" />
+                        android:src="@drawable/g_"
+                        android:visibility="gone" />
 
                 </LinearLayout>
 

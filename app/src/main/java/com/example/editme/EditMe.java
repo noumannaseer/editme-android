@@ -3,6 +3,7 @@ package com.example.editme;
 import android.app.Application;
 
 import com.example.editme.utils.AndroidUtil;
+import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
 import com.google.firebase.FirebaseApp;
@@ -24,6 +25,8 @@ public class EditMe
 
     @Getter private FirebaseAuth mAuth;
     @Getter private FirebaseFirestore mFireStore;
+    @Getter private AccessToken mFaceBookAccessToken;
+
 
     //**************************************************************************
     @Override
@@ -42,6 +45,18 @@ public class EditMe
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
 
+    }
+
+    //*********************************************************************
+    public boolean isFaceBookLogin()
+    //*********************************************************************
+    {
+        mFaceBookAccessToken = AccessToken.getCurrentAccessToken();
+        boolean isLoggedIn = mFaceBookAccessToken != null && !mFaceBookAccessToken.isExpired();
+        if (isLoggedIn)
+            return true;
+        else
+            return false;
     }
 
     //*********************************************************************

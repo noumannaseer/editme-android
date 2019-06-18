@@ -79,9 +79,6 @@ public class CheckOutActivity
 
         mAddImagesCustomAdapter = new AddImagesCustomAdapter(mEditImageList,
                                                              this, false, this);
-//        mBinding.recyclerView.setLayoutManager(
-//                new GridLayoutManager(this, 2));
-//        mBinding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         mBinding.recyclerView.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         mBinding.recyclerView.setAdapter(mAddImagesCustomAdapter);

@@ -9,10 +9,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -26,6 +29,8 @@ import com.google.android.material.snackbar.Snackbar;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
@@ -45,7 +50,7 @@ public class UIUtils
 
     public static final String USER_REMEMBER = "USER_REMEMBER";
     public static final String USER_NAME = "USER_NAME";
-    public static final String PREF_KEY_FILE_NAME = "editme";
+    public static final String PREF_KEY_FILE_NAME = "EDITME";
     public static final String INTRO_LOADED = "INTRO_LOADED";
     public static final String CURRENT_LANGUAGE = "CURRENT_LANGUAGE";
     public static final String PACKAGE_STATUS = "PACKAGE_STATUS";
@@ -59,6 +64,7 @@ public class UIUtils
         // Writing data to SharedPreferences
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(PACKAGE_STATUS, status);
+        editor.commit();
     }
 
     public static boolean getPackageStatus()
@@ -541,6 +547,34 @@ public class UIUtils
                 .makeText(AndroidUtil.getApplicationContext(), message,
                           longToast ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT)
                 .show();
+    }
+
+
+    //*********************************************************************
+    private void printKeyHash(Activity activity)
+    //*********************************************************************
+    {
+        // Add code to print out the key hash
+        try
+        {
+            PackageInfo info = activity.getPackageManager()
+                                       .getPackageInfo("com.example.editme",
+                                                       PackageManager.GET_SIGNATURES);
+            for (Signature signature : info.signatures)
+            {
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
+            }
+        }
+        catch (PackageManager.NameNotFoundException e)
+        {
+            Log.e("KeyHash:", e.toString());
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            Log.e("KeyHash:", e.toString());
+        }
     }
 
 }

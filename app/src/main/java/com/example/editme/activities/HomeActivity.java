@@ -1,5 +1,6 @@
 package com.example.editme.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -79,10 +80,7 @@ public class HomeActivity
                 loadFragment(mHomeFragment);
                 return true;
             case R.id.action_orders:
-                if (!UIUtils.getPackageStatus())
-                    loadFragment(new PackagesFragment());
-                else
-                    loadFragment(mOrderFragment);
+                loadFragment(mOrderFragment);
                 return true;
             case R.id.action_profile:
                 loadFragment(mProfileFragment);
@@ -91,5 +89,7 @@ public class HomeActivity
             return false;
         }
     };
+
+
 
 }

@@ -3,8 +3,14 @@ package com.example.editme.fragments;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.AndroidException;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +18,9 @@ import android.widget.Toast;
 
 import com.example.editme.EditMe;
 import com.example.editme.R;
+import com.example.editme.activities.FaceBookLoginActivity;
+import com.example.editme.activities.GoogleSignInActivity;
+import com.example.editme.activities.PackagesActivity;
 import com.example.editme.activities.PlaceOrderActivity;
 import com.example.editme.activities.RecoveryEmailActivity;
 import com.example.editme.databinding.FragmentOrderBinding;
@@ -23,6 +32,7 @@ import com.example.editme.utils.Constants;
 import com.example.editme.utils.UIUtils;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
+import com.facebook.FacebookActivity;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
@@ -31,9 +41,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import androidx.annotation.Nullable;
@@ -71,8 +86,6 @@ public class OrderFragment
     private Dialog mSignUpDialog;
     private Dialog mLoginDialog;
     private LoginDialogBinding mLoginDialogBinding;
-    private static final String EMAIL = "email";
-    private CallbackManager callbackManager;
 
     //*********************************************************************
     @Override
@@ -93,7 +106,33 @@ public class OrderFragment
     private void initControls()
     //*********************************************************************
     {
-        mBinding.placeOrder.setOnClickListener(view -> displayLoginDialog());
+        mBinding.placeOrder.setOnClickListener(view -> {
+            if (EditMe.instance()
+                      .getMAuth()
+                      .getCurrentUser() != null || EditMe.instance()
+                                                         .isFaceBookLogin())
+            {
+                val user = EditMe.instance()
+                                 .getMAuth()
+                                 .getCurrentUser();
+                val a = EditMe.instance()
+                              .isFaceBookLogin();
+                if (!UIUtils.getPackageStatus())
+                {
+                    gotoPackagesScreen();
+                }
+                else
+                    gotoPlaceOrderScreen();
+            }
+            else
+                displayLoginDialog();
+        });
+    }
+
+    private void gotoPackagesScreen()
+    {
+        Intent packagesIntent = new Intent(getActivity(), PackagesActivity.class);
+        startActivity(packagesIntent);
     }
 
     //*********************************************************************
@@ -109,7 +148,6 @@ public class OrderFragment
     //*********************************************************************
     {
         mSignUpDialog = new Dialog(getActivity(), R.style.CustomTransparentDialog);
-        //dialog.setContentView(R.layout.image_description_dialog);
         mSignUpDialogBinding = DataBindingUtil.inflate(
                 LayoutInflater.from(getContext()), R.layout.signup_dialog, null, false);
         mSignUpDialog.setContentView(mSignUpDialogBinding.getRoot());
@@ -120,75 +158,10 @@ public class OrderFragment
             displayLoginDialog();
         });
         mSignUpDialogBinding.closeDialog.setOnClickListener(view -> mSignUpDialog.dismiss());
-
-        mSignUpDialogBinding.btnFacebook.setOnClickListener(view -> {
-            LoginManager.getInstance()
-                        .logInWithReadPermissions(
-                                this,
-                                Arrays.asList("email"));
-        });
-        // If you are using in a fragment, call loginButton.setFragment(this);
-
-
-        AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        boolean isLoggedIn = accessToken != null && !accessToken.isExpired();
-        if (isLoggedIn)
-            UIUtils.testToast(false, "Already facebook login");
-
-        callbackManager = CallbackManager.Factory.create();
-        // Callback registration
-        LoginManager.getInstance()
-                    .registerCallback(
-                            callbackManager,
-                            new FacebookCallback<LoginResult>()
-                            {
-                                @Override
-                                public void onSuccess(LoginResult loginResult)
-                                {
-                                    // Handle succes
-                                    UIUtils.testToast(false, "FaceBook Login Sucesfull");
-                                }
-
-                                @Override
-                                public void onCancel()
-                                {
-                                    UIUtils.testToast(false, "FaceBook Login Cancel");
-
-                                }
-
-                                @Override
-                                public void onError(FacebookException exception)
-                                {
-                                    UIUtils.testToast(false, exception.getLocalizedMessage()
-                                                                      .toString());
-
-                                }
-                            }
-                    );
-      /*  mSignUpDialogBinding.facebookLogin.registerCallback(callbackManager,
-                                                            new FacebookCallback<LoginResult>()
-                                                            {
-                                                                @Override
-                                                                public void onSuccess(LoginResult loginResult)
-                                                                {
-                                                                    // App code
-                                                                }
-
-                                                                @Override
-                                                                public void onCancel()
-                                                                {
-                                                                    // App code
-                                                                }
-
-                                                                @Override
-                                                                public void onError(FacebookException exception)
-                                                                {
-                                                                    // App code
-                                                                }
-                                                            });*/
         mSignUpDialog.show();
 
     }
+
 
     //*********************************************************************
     private void displayLoginDialog()
@@ -210,7 +183,31 @@ public class OrderFragment
         mLoginDialogBinding.forgotPassword.setOnClickListener(view -> gotoForgotPasswordScreen());
         mLoginDialogBinding.closeDialog.setOnClickListener(view -> mLoginDialog.dismiss());
         mLoginDialog.show();
+        mLoginDialogBinding.btnFacebook.setOnClickListener(view -> {
+            mLoginDialog.dismiss();
+            gotoFaceBookLoginScreen();
+        });
 
+        mLoginDialogBinding.btnGoogleplus.setOnClickListener(view -> {
+            mLoginDialog.dismiss();
+            ;
+            gotoGoogleSignInScreen();
+        });
+
+    }
+
+    private void gotoGoogleSignInScreen()
+    {
+        Intent googleSignInIntent = new Intent(getActivity(), GoogleSignInActivity.class);
+        startActivity(googleSignInIntent);
+    }
+
+    //*********************************************************************
+    private void gotoFaceBookLoginScreen()
+    //*********************************************************************
+    {
+        Intent faceBookLoginIntent = new Intent(getActivity(), FaceBookLoginActivity.class);
+        startActivity(faceBookLoginIntent);
     }
 
     //*********************************************************************
@@ -219,21 +216,6 @@ public class OrderFragment
     {
         Intent forgotPasswordIntent = new Intent(getActivity(), RecoveryEmailActivity.class);
         startActivity(forgotPasswordIntent);
-    }
-
-//    @Override
-//     void onActivityResult(int requestCode, int resultCode, Intent data)
-//    {
-//        callbackManager.onActivityResult(requestCode, resultCode, data);
-//        super.onActivityResult(requestCode, resultCode, data);
-//    }
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
-    {
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     //***************************************************************
@@ -335,6 +317,7 @@ public class OrderFragment
 
                           UIUtils.setUserRemember(true);
                           UIUtils.testToast(false, "login successfulls");
+                          mLoginDialog.dismiss();
                           mLoginDialogBinding.progressView.setVisibility(View.GONE);
 
                       }
@@ -509,13 +492,6 @@ public class OrderFragment
               });
     }
 
-
-    //************************************************
-    private void openLoginDialog()
-    //************************************************
-    {
-
-    }
 
     //**********************************************
     interface AccountRegistrationListener

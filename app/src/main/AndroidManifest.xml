@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest package="com.example.editme"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
 
     <application
         android:name=".EditMe"
@@ -15,7 +12,16 @@
         android:roundIcon="@mipmap/editme_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.ImageUploadingActivity"></activity>
+        <activity
+            android:name=".activities.PackagesActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.GoogleSignInActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.FaceBookLoginActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activities.ImageUploadingActivity" />
         <activity
             android:name=".activities.CheckOutActivity"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -82,6 +88,9 @@
             </intent-filter>
         </activity>
 
+        <meta-data
+            android:name="com.google.android.gms.wallet.api.enabled"
+            android:value="true" />
     </application>
 
 </manifest>
