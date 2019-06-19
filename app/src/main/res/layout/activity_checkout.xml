@@ -65,8 +65,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:elevation="50dp"
-                    android:orientation="horizontal">
+                    android:elevation="50dp">
 
                 </androidx.recyclerview.widget.RecyclerView>
 

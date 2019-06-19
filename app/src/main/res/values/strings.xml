@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Edit.me</string>
     <string name="edit_me"><b>Edit.me</b></string>
+
+    <string name="facebook_app_id">672878816484469</string>
+    <string name="fb_login_protocol_scheme">fb672878816484469</string>
     <string name="error">Error</string>
     <string name="ok">@android:string/ok</string>
     <string name="double_the_pleasure_double_the_place_you_order">Double the Pleasure,Double the Place you order</string>
@@ -22,13 +25,13 @@
     <string name="name">Name</string>
     <string name="email_hint">name@example.com</string>
     <string name="password">Password</string>
-    <string name="already_have_an_account">Already have an account? </string>
+    <string name="already_have_an_account">Already have an account?&#160;</string>
     <string name="login_now">Login Now</string>
     <string name="login">Login</string>
     <string name="forgot_password">Forgot password ?</string>
     <string name="login_to_edit_me">Login to Edit Me</string>
     <string name="signup_now">Signup Now</string>
-    <string name="dont_have_an_account">Dont have an account ? </string>
+    <string name="dont_have_an_account">Don\'t have an account ? &#160;</string>
     <string name="forgot">Forgot</string>
     <string name="recovery_email_dialog">We will send a reset code to your recovery email to reset your password</string>
     <string name="recovery_email">Recovery email</string>
@@ -86,5 +89,45 @@
     <string name="total_images">Total images</string>
     <string name="remaining_images">Remaining images</string>
     <string name="delivery_time">Deliver time</string>
+
+
+    <string name="camera_button_text">Upload</string>
+    <string name="sign_in_prompt">Sign In to begin</string>
+    <string name="take_photo_prompt">Upload a Photo</string>
+    <string name="download">Download</string>
+    <string name="sign_in_anonymously">Sign In</string>
+    <string name="rationale_storage">This sample reads images from your camera to demonstrate uploading.</string>
+    <string name="label_link">Link to Uploaded File</string>
+    <string name="label_download">Download File</string>
+    <string name="log_out">Log out</string>
+    <string name="success">Success</string>
+
+    <string name="progress_downloading">Downloading…</string>
+    <string name="progress_uploading">Uploading…</string>
+    <string name="progress_auth">Signing In…</string>
+
+    <string name="upload_success">Upload finished</string>
+    <string name="upload_failure">Upload failed</string>\
+
+    <string name="download_success">Download finished</string>
+    <string name="download_failure">Download failure</string>
+    <string name="authentication_failed">Authentication failed</string>
+    <string name="email_exist">Email already exists</string>
+    <string name="account_created">Account created.</string>
+    <string name="verify_acount">Please check your email to verify your account</string>
+    <string name="login_error">Login error</string>
+    <string name="invalid_email_password">Invalid Email and password</string>
+    <string name="email_sent">Email sent!</string>
+    <string name="facebook_signin">FaceBook SignIn</string>
+    <string name="google_signin">Google SignIn</string>
+
+
+    <string name="googlepay_status_unavailable" translatable="false">Unfortunately, Google Pay is not available on this phone.</string>
+    <string name="googlepay_status_checking" translatable="false">Checking if Google Pay is available...</string>
+    <string name="payments_show_name" translatable="false">Successfully received payment data for %s!</string>
+    <string name="fb_login_successs">FaceBook Login Successfully</string>
+    <string name="fb_login_cancel">FaceBook Login Cancel</string>
+    <string name="google_signin_failed">Google sign in failed</string>
+
 
 </resources>

@@ -3,6 +3,8 @@ package com.example.editme.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
+import lombok.NonNull;
+import lombok.val;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -12,10 +14,17 @@ import android.text.BoringLayout;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.example.editme.EditMe;
 import com.example.editme.R;
 import com.example.editme.databinding.ActivitySettingsBinding;
 import com.example.editme.utils.AndroidUtil;
 import com.example.editme.utils.UIUtils;
+import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FacebookAuthProvider;
 
 
 //*****************************************************************
@@ -43,14 +52,17 @@ public class SettingsActivity
     {
 
         setTab();
-        mBinding.logoutLayout.setOnClickListener(view -> logoutUser());
         mBinding.aboutUsLayout.setOnClickListener(view -> openAboutDialog());
         mBinding.privacyPolicyLayout.setOnClickListener(view -> gotoBrowserActivity());
         mBinding.userNameLayout.setOnClickListener(view -> gotoUpdateNameScreen(false));
         mBinding.emailLayout.setOnClickListener(view -> gotoUpdateNameScreen(true));
         mBinding.changePasswordLayout.setOnClickListener(view -> gotoUpdatePasswordScreen());
-        mBinding.paymentsLayout.setOnClickListener(
-                view -> UIUtils.testToast(false, "Package is not subscribed"));
+        mBinding.paymentsLayout.setOnClickListener(view ->
+                                                   {
+                                                       UIUtils.testToast(false,
+                                                                         "Package is not subscribed");
+                                                   });
+        mBinding.logoutLayout.setOnClickListener(view -> logoutUser());
 
     }
 
@@ -98,13 +110,35 @@ public class SettingsActivity
                                            public void onClick(DialogInterface dialog, int which)
                                            {
                                                if (which == -1)
-                                                   gotoLoginActivity();
+                                               {
+                                                   UIUtils.setPackageStatus(false);
+                                                   EditMe.instance()
+                                                         .getMAuth()
+                                                         .signOut();
+                                                   LoginManager.getInstance()
+                                                               .logOut();
+                                                   googleLogout();
+                                                   SettingsActivity.super.onBackPressed();
+                                               }
                                            }
                                        }, AndroidUtil.getString(R.string.yes),
                                        AndroidUtil.getString(R.string.no));
 
         });
 
+    }
+
+    private void googleLogout()
+    {
+        // Configure Google Sign In
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(
+                GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(AndroidUtil.getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        val googleSignInClient = GoogleSignIn.getClient(this, gso);
+        // Google sign out
+        googleSignInClient.signOut();
     }
 
     //*****************************************************************

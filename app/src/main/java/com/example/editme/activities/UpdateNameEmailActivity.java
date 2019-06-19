@@ -40,6 +40,7 @@ public class UpdateNameEmailActivity
     private void initControls()
     //****************************************************************************
     {
+        setTab();
         getParcelable();
         if (mIsEmailUpdate)
         {

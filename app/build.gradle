@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 28
@@ -24,8 +25,13 @@ android {
     dataBinding {
         enabled = true
     }
+
 }
 
+repositories {
+    mavenCentral()
+
+}
 dependencies {
 //   implementation fileTree(dir: 'libs', include: ['*.jar'])
 //    implementation 'androidx.appcompat:appcompat:1.0.0'
@@ -61,6 +67,16 @@ dependencies {
     implementation 'com.github.esafirm:android-image-picker:2.0.0'
     implementation 'com.azoft.carousellayoutmanager:carousel:1.2.4'
     implementation 'com.github.devlight:infinitecycleviewpager:1.0.2'
+
+    //google signin
+    implementation 'com.google.firebase:firebase-auth:17.0.0'
+    implementation 'com.google.android.gms:play-services-auth:16.0.1'
+    implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
+
+
+    implementation 'com.google.android.gms:play-services-auth:16.0.1'
+
+    implementation 'com.google.android.gms:play-services-wallet:16.0.0'
 
 
     // Google play services for location information
