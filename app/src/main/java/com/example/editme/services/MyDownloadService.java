@@ -22,8 +22,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.example.editme.R;
-import com.example.editme.activities.HomeActivity;
-import com.example.editme.activities.ImageUploadingActivity;
+import com.example.editme.fragments.HomeFragment;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -189,7 +188,7 @@ public class MyDownloadService
         dismissProgressNotification();
 
         // Make Intent to MainActivity
-        Intent intent = new Intent(this, ImageUploadingActivity.class)
+        Intent intent = new Intent(this, HomeFragment.class)
                 .putExtra(EXTRA_DOWNLOAD_PATH, downloadPath)
                 .putExtra(EXTRA_BYTES_DOWNLOADED, bytesDownloaded)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);

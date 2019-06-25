@@ -3,6 +3,8 @@ package com.example.editme.utils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,7 +15,9 @@ import android.content.pm.Signature;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -31,18 +35,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.regex.Pattern;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import lombok.NonNull;
 import lombok.val;
 
 import static android.content.Context.MODE_PRIVATE;
 import static com.example.editme.utils.AndroidUtil.getApplicationContext;
 import static com.example.editme.utils.AndroidUtil.getResources;
+import static com.example.editme.utils.Constants.CHANNEL_ID;
 
 public class UIUtils
 {
@@ -287,7 +296,7 @@ public class UIUtils
     {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        byte bufferByte[] = new byte[1024];
+        byte[] bufferByte = new byte[1024];
         int length;
         try
         {
@@ -456,6 +465,47 @@ public class UIUtils
         return alert;
     }
 
+    public static String getRemainingTime(long previousTime)
+    {
+
+
+        long timeDifference = (previousTime * 1000) - System.currentTimeMillis();
+        long days = timeDifference / (1000 * 60 * 60 * 24);
+        long hours = timeDifference / (1000 * 60 * 60) - (days * 24);
+        long minutes = timeDifference / (1000 * 60) - (days * 24 * 60) - (hours * 60);
+        long seconds = timeDifference / (1000) - (days * 24 * 60 * 60) - (hours * 60 * 60) - (minutes * 60);
+
+        String alert = "";
+        if (days > 0)
+        {
+            alert += AndroidUtil.getString(R.string.elapsed_time_days_hour, days);
+        }
+        else
+        {
+            if (hours > 0)
+            {
+//                alert += String.format("%d hours, %d minutes and %d seconds ago",
+//                                       hours, minutes, seconds);
+                alert += AndroidUtil.getString(R.string.elapsed_hour_minutes,
+                                               hours);
+
+            }
+            else
+            {
+                if (minutes > 0)
+                {
+                    alert += AndroidUtil.getString(R.string.elapsed_time_minutes, minutes, seconds);
+                }
+                else
+                {
+                    alert += AndroidUtil.getString(R.string.elapsed_time_secounds, seconds);
+                }
+            }
+        }
+
+        //     AndroidUtil.toast(false, alert);
+        return alert;
+    }
 
     public static Dialog displayNoInternetDialog(Activity activity)
     {
@@ -577,4 +627,66 @@ public class UIUtils
         }
     }
 
+
+    static void makeStatusNotification(String message, Context context)
+    {
+
+        // Make a channel if necessary
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            // Create the NotificationChannel, but only on API 26+ because
+            // the NotificationChannel class is new and not in the support library
+            CharSequence name = Constants.VERBOSE_NOTIFICATION_CHANNEL_NAME;
+            String description = Constants.VERBOSE_NOTIFICATION_CHANNEL_DESCRIPTION;
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel =
+                    new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+
+            // Add the channel
+            NotificationManager notificationManager =
+                    (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+            if (notificationManager != null)
+            {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+
+        // Create the notification
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle(Constants.NOTIFICATION_TITLE)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setVibrate(new long[0]);
+
+        // Show the notification
+        NotificationManagerCompat.from(context)
+                                 .notify(Constants.NOTIFICATION_ID, builder.build());
+
+    }
+
+    public static String getDate(long timestamp)
+    {
+        timestamp = timestamp * 1000;
+        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+        cal.setTimeInMillis(timestamp);
+        String date = DateFormat.format("dd-MM-yyyy", cal)
+                                .toString();
+        return date;
+    }
+
+    public static String randomAlphaNumeric(int count)
+    {
+        String ALPHA_NUMERIC_STRING = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        StringBuilder builder = new StringBuilder();
+        while (count-- != 0)
+        {
+            int character = (int)(Math.random() * ALPHA_NUMERIC_STRING.length());
+            builder.append(ALPHA_NUMERIC_STRING.charAt(character));
+        }
+        return builder.toString();
+    }
 }

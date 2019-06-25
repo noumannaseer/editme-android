@@ -86,9 +86,7 @@ public class PackagesActivity
         mBinding.packagesPrice.setOnClickListener(view -> {
             requestPayment(getWindow().getDecorView()
                                       .getRootView());
-            //**/UIUtils.testToast(false, "Package bu successfull");
             UIUtils.setPackageStatus(true);
-            //super.onBackPressed();
         });
     }
 
@@ -125,6 +123,15 @@ public class PackagesActivity
         mBinding.packageName.setText(packagesDetail.getPackageName());
         mBinding.packagesDetail.setText(packagesDetail.getPackageDescription());
         mBinding.packagesPrice.setText("$" + packagesDetail.getPrice());
+
+    }
+
+    @Override
+    public void onPurchaseClick()
+    {
+        requestPayment(getWindow().getDecorView()
+                                  .getRootView());
+        UIUtils.setPackageStatus(true);
 
     }
 
@@ -183,7 +190,9 @@ public class PackagesActivity
         }
     }
 
+    //**********************************************************************
     private void possiblyShowGooglePayButton()
+    //**********************************************************************
     {
         final Optional<JSONObject> isReadyToPayJson = PaymentsUtil.getIsReadyToPayRequest();
         if (!isReadyToPayJson.isPresent())
@@ -208,19 +217,24 @@ public class PackagesActivity
                                        {
                                            if (task.isSuccessful())
                                            {
-                                               AndroidUtil.toast(false, "google pay is avaolable");
+                                               AndroidUtil.toast(false, AndroidUtil.getString(
+                                                       R.string.google_pay_is_available));
                                            }
                                            else
                                            {
-                                               Log.w("isReadyToPay failed", task.getException());
+                                               Log.w(AndroidUtil.getString(
+                                                       R.string.is_ready_to_pay_failed),
+                                                     task.getException());
                                            }
                                        }
                                    });
     }
 
 
+    //**********************************************************************
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
+    //**********************************************************************
     {
         switch (requestCode)
         {
@@ -249,7 +263,9 @@ public class PackagesActivity
         }
     }
 
+    //**********************************************************************
     private void handlePaymentSuccess(PaymentData paymentData)
+    //**********************************************************************
     {
         String paymentInformation = paymentData.toJson();
 
@@ -306,7 +322,9 @@ public class PackagesActivity
         }
     }
 
+    //**********************************************************************
     private void handleError(int statusCode)
+    //**********************************************************************
     {
         Log.w("loadPaymentData failed", String.format("Error code: %d", statusCode));
     }

@@ -19,20 +19,47 @@ import static com.example.editme.utils.AndroidUtil.getResources;
 public class EditImage
         implements Parcelable
 
+
 {
     private String description;
     private Uri imageIntentURI;
+    private int isUploading;
 
-    public EditImage(String description, Uri imageIntentURI)
+
+    public EditImage()
+    {
+    }
+
+    public EditImage(String description, Uri imageIntentURI, int isUploading)
     {
         this.description = description;
         this.imageIntentURI = imageIntentURI;
+        this.isUploading = isUploading;
+    }
+
+    public Drawable getImageDrawable(Activity activity)
+    {
+        Bitmap bitmap = null;
+        try
+        {
+            bitmap = MediaStore.Images.Media.getBitmap(
+                    activity.getContentResolver(),
+                    imageIntentURI);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        Drawable d = new BitmapDrawable(getResources(), bitmap);
+        return d;
+
     }
 
     protected EditImage(Parcel in)
     {
         description = in.readString();
         imageIntentURI = in.readParcelable(Uri.class.getClassLoader());
+        isUploading = in.readInt();
     }
 
     public static final Creator<EditImage> CREATOR = new Creator<EditImage>()
@@ -70,26 +97,14 @@ public class EditImage
         this.imageIntentURI = imageIntentURI;
     }
 
-    public Drawable getImageDrawable(Activity activity)
+    public int isUploading()
     {
-        Bitmap bitmap = null;
-        try
-        {
-            bitmap = MediaStore.Images.Media.getBitmap(
-                    activity.getContentResolver(),
-                    imageIntentURI);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        Drawable d = new BitmapDrawable(getResources(), bitmap);
-        return d;
-
+        return isUploading;
     }
 
-    public EditImage()
+    public void setUploading(int uploading)
     {
+        isUploading = uploading;
     }
 
     @Override
@@ -103,5 +118,6 @@ public class EditImage
     {
         dest.writeString(description);
         dest.writeParcelable(imageIntentURI, flags);
+        dest.writeInt(isUploading);
     }
 }

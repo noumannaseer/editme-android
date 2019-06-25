@@ -5,7 +5,9 @@ import android.os.Bundle;
 
 import com.example.editme.EditMe;
 import com.example.editme.R;
+import com.example.editme.model.User;
 import com.example.editme.utils.AndroidUtil;
+import com.example.editme.utils.Constants;
 import com.example.editme.utils.UIUtils;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -20,6 +22,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
 
 import java.util.Arrays;
 
@@ -52,7 +55,7 @@ public class FaceBookLoginActivity
         LoginManager.getInstance()
                     .logInWithReadPermissions(
                             this,
-                            Arrays.asList("email"));
+                            Arrays.asList(Constants.EMAIL));
         LoginManager.getInstance()
                     .setLoginBehavior(LoginBehavior.DEVICE_AUTH);
 
@@ -89,8 +92,7 @@ public class FaceBookLoginActivity
                                 @Override
                                 public void onError(FacebookException exception)
                                 {
-                                    UIUtils.testToast(false, exception.getLocalizedMessage()
-                                                                      .toString());
+                                    UIUtils.testToast(false, exception.getLocalizedMessage());
                                     FaceBookLoginActivity.super.onBackPressed();
                                 }
                             }
@@ -113,16 +115,35 @@ public class FaceBookLoginActivity
                           {
                               if (task.isSuccessful())
                               {
-                                  FirebaseUser myuser = EditMe.instance()
-                                                              .getMAuth()
-                                                              .getCurrentUser();
-                                  UIUtils.testToast(false,
-                                                    myuser.getDisplayName() + " " + myuser.getEmail());
-                                  FaceBookLoginActivity.super.onBackPressed();
+                                  FirebaseUser user = EditMe.instance()
+                                                            .getMAuth()
+                                                            .getCurrentUser();
+
+                                  signUpFaceBook(user.getDisplayName(), user.getEmail(),
+                                                 user.getUid(),
+                                                 user.getPhotoUrl() + "?height=500");
                               }
 
                           }
                       });
+    }
+
+    //*********************************************************************
+    private String getProfileImage(FirebaseUser user)
+    //*********************************************************************
+    {
+        String facebookUserId = "";
+        // find the Facebook profile and get the user's id
+        for (UserInfo profile : user.getProviderData())
+        {
+            // check if the provider id matches "facebook.com"
+            if (FacebookAuthProvider.PROVIDER_ID.equals(profile.getProviderId()))
+            {
+                facebookUserId = profile.getUid();
+            }
+        }
+        String photoUrl = "https://graph.facebook.com/" + facebookUserId + "/picture?height=500";
+        return photoUrl;
     }
 
     //**********************************************************************************************
@@ -132,6 +153,28 @@ public class FaceBookLoginActivity
     {
         callbackManager.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    //**********************************************************************************************
+    private void signUpFaceBook(String displayName, String email, String userId, String photoUrl)
+    //**********************************************************************************************
+    {
+        EditMe.instance()
+              .getMFireStore()
+              .collection(Constants.Users)
+              .document(userId)
+              .set(new User(displayName, email, userId, photoUrl))
+              .addOnCompleteListener(
+                      new OnCompleteListener<Void>()
+                      {
+                          @Override
+                          public void onComplete(@androidx.annotation.NonNull Task<Void> task)
+                          {
+                              EditMe.instance()
+                                    .loadUserDetail();
+                              FaceBookLoginActivity.super.onBackPressed();
+                          }
+                      });
     }
 
 }

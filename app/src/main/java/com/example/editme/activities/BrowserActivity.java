@@ -54,7 +54,7 @@ public class BrowserActivity
         setContentView(R.layout.activity_browser);
 
         getData();
-        val toolbar = (Toolbar)findViewById(R.id.toolbar);
+        val toolbar = findViewById(R.id.toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(mTitle);
         mWebView = findViewById(R.id.web_view);

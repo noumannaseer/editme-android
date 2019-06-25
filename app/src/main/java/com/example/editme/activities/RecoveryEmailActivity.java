@@ -48,7 +48,6 @@ public class RecoveryEmailActivity
         setSupportActionBar(mBinding.toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
         mBinding.sendEmail.setOnClickListener(view -> sendRecoveryEmail());
 
     }
@@ -92,14 +91,15 @@ public class RecoveryEmailActivity
                                          }
                                          else
                                              UIUtils.displayAlertDialog(task.getException()
-                                                                            .getLocalizedMessage()
-                                                                            .toString(),
+                                                                            .getLocalizedMessage(),
                                                                         null,
                                                                         RecoveryEmailActivity.this);
                                      });
     }
 
+    //******************************************************************
     private void gotoLoginScreen()
+    //******************************************************************
     {
         Intent loginIntent = new Intent(this, LoginActivity.class);
         loginIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

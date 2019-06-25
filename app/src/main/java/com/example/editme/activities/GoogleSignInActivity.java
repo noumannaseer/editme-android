@@ -1,15 +1,14 @@
 package com.example.editme.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-import lombok.NonNull;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.example.editme.EditMe;
 import com.example.editme.R;
+import com.example.editme.model.User;
 import com.example.editme.utils.AndroidUtil;
+import com.example.editme.utils.Constants;
 import com.example.editme.utils.UIUtils;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -22,6 +21,9 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+
+import androidx.appcompat.app.AppCompatActivity;
+import lombok.NonNull;
 
 
 //*****************************************************************
@@ -127,21 +129,50 @@ public class GoogleSignInActivity
                   {
                       if (task.isSuccessful())
                       {
-                          // Sign in success, update UI with the signed-in user's information
                           FirebaseUser user = EditMe.instance()
                                                     .getMAuth()
                                                     .getCurrentUser();
-                          AndroidUtil.toast(false, user.getDisplayName() + " " + user.getEmail());
-                          GoogleSignInActivity.super.onBackPressed();
+                          signUpGoogle(user.getDisplayName(), user.getEmail(),
+                                       user.getUid(),
+                                       user.getPhotoUrl()
+                                           .toString());
                       }
                       else
                       {
                           // If sign in fails, display a message to the user.
+                          AndroidUtil.toast(false, task.getException()
+                                                       .getLocalizedMessage()
+                                                       .toString());
+                          GoogleSignInActivity.super.onBackPressed();
                       }
 
                       // ...
                   }
               });
+    }
+
+    //******************************************************************************************
+    private void signUpGoogle(String displayName, String email, String userId, String photoUrl)
+    //******************************************************************************************
+    {
+        EditMe.instance()
+              .getMFireStore()
+              .collection(Constants.Users)
+              .document(userId)
+              .set(new User(displayName, email, userId, photoUrl))
+              .addOnCompleteListener(
+                      new OnCompleteListener<Void>()
+                      {
+                          @Override
+                          public void onComplete(@androidx.annotation.NonNull Task<Void> task)
+                          {
+                              EditMe.instance()
+                                    .loadUserDetail();
+
+                              GoogleSignInActivity.super.onBackPressed();
+
+                          }
+                      });
     }
 
 }

@@ -9,6 +9,25 @@ public class User
     private String displayName;
     private String email;
     private String uid;
+    private String photoUrl;
+
+    public User(String displayName, String email, String uid, String photoUrl)
+    {
+        this.displayName = displayName;
+        this.email = email;
+        this.uid = uid;
+        this.photoUrl = photoUrl;
+    }
+
+    public String getPhotoUrl()
+    {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl)
+    {
+        this.photoUrl = photoUrl;
+    }
 
     public String getUid()
     {

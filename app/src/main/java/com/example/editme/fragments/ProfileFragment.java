@@ -1,6 +1,7 @@
 package com.example.editme.fragments;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -22,18 +23,33 @@ import com.esafirm.imagepicker.features.ReturnMode;
 import com.esafirm.imagepicker.model.Image;
 import com.example.editme.EditMe;
 import com.example.editme.R;
+import com.example.editme.activities.HomeActivity;
 import com.example.editme.activities.SettingsActivity;
+import com.example.editme.adapters.OrdersCustomAdapter;
 import com.example.editme.databinding.FragmentProfileBinding;
 import com.example.editme.model.EditImage;
+import com.example.editme.model.Order;
+import com.example.editme.model.User;
 import com.example.editme.utils.AndroidUtil;
+import com.example.editme.utils.Constants;
 import com.example.editme.utils.UIUtils;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.annotation.Nullable;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import lombok.val;
 
 
@@ -59,7 +75,19 @@ public class ProfileFragment
     private FragmentProfileBinding mBinding;
     private View mRootView;
     private Uri mImageIntentURI;
+    private User mUser;
+    private List<Order> mOrderList;
 
+
+    public HomeActivity mHomeActivity;
+
+
+    @Override
+    public void onAttach(@NonNull Activity activity)
+    {
+        super.onAttach(activity);
+        mHomeActivity = (HomeActivity)activity;
+    }
 
     //*********************************************************************
     @Override
@@ -71,8 +99,8 @@ public class ProfileFragment
         {
             mBinding = FragmentProfileBinding.inflate(inflater, container, false);
             mRootView = mBinding.getRoot();
+            initControls();
         }
-        initControls();
         return mRootView;
     }
 
@@ -86,31 +114,98 @@ public class ProfileFragment
         ((AppCompatActivity)getActivity()).getSupportActionBar()
                                           .setDisplayShowTitleEnabled(false);
 
-        val user = EditMe.instance()
-                         .getMAuth()
-                         .getCurrentUser();
+        mUser = EditMe.instance()
+                      .getMUserDetail();
 
-        if (user != null && !TextUtils.isEmpty(user.getDisplayName()) && !TextUtils.isEmpty(
-                user.getPhotoUrl()
-                    .toString()))
-        {
+        if (mUser == null)
+            return;
 
-            UIUtils.loadImages(user.getPhotoUrl()
-                                   .toString(), mBinding.profileImage,
-                               AndroidUtil.getDrawable(R.drawable.ic_person_black_24dp));
-            mBinding.userName.setText(user.getDisplayName());
-
-        }
-        else
-        {
-            mBinding.profileImage.setOnClickListener(view -> showImageDialog());
-            mBinding.profileImage.setImageDrawable(
-                    AndroidUtil.getDrawable(R.drawable.ic_person_black_24dp));
-            mBinding.userName.setText("username");
-        }
+        UIUtils.loadImages(mUser.getPhotoUrl(), mBinding.profileImage,
+                           AndroidUtil.getDrawable(R.drawable.ic_person_black_24dp));
+        mBinding.userName.setText(mUser.getDisplayName());
+        mBinding.profileImage.setOnClickListener(view -> showImageDialog());
+        getCompletedOrder();
 
     }
 
+    private void getCompletedOrder()
+    {
+        showProgressView();
+        if (EditMe.instance()
+                  .getMAuth()
+                  .getCurrentUser() == null)
+        {
+            hideProgressView();
+            return;
+        }
+        else if (EditMe.instance()
+                       .getMUserDetail() == null)
+        {
+            initControls();
+            return;
+        }
+        val userEmail = EditMe.instance()
+                              .getMUserDetail()
+                              .getEmail();
+        EditMe.instance()
+              .getMFireStore()
+              .collection(Constants.ORDERS)
+              .whereEqualTo(Constants.EMAIL, userEmail)
+              .addSnapshotListener(new EventListener<QuerySnapshot>()
+              {
+                  @Override
+                  public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e)
+                  {
+                      mOrderList = new ArrayList<>();
+                      for (val child : queryDocumentSnapshots.getDocuments())
+                      {
+
+                          val order = child.toObject(Order.class);
+                          if (order.getStatus()
+                                   .equals(Constants.STATUS_COMPLETE))
+                              mOrderList.add(order);
+                      }
+                      showDataOnRecyclerView();
+                      hideProgressView();
+                  }
+              });
+
+    }
+
+
+    //********************************************************************************
+    private void showDataOnRecyclerView()
+    //********************************************************************************
+    {
+        if (mOrderList == null || mOrderList.size() == 0)
+        {
+            mBinding.noResultFound.setVisibility(View.VISIBLE);
+            return;
+        }
+        else
+            mBinding.noResultFound.setVisibility(View.GONE);
+
+        val orderCustomAdapter = new OrdersCustomAdapter(mOrderList, mHomeActivity);
+        mBinding.recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mBinding.recyclerView.setAdapter(orderCustomAdapter);
+
+    }
+
+    //*****************************************
+    private void showProgressView()
+    //*****************************************
+    {
+        mBinding.progressView.setVisibility(View.VISIBLE);
+
+    }
+
+    //*****************************************
+    private void hideProgressView()
+    //*****************************************
+    {
+        mBinding.progressView.setVisibility(View.GONE);
+
+    }
 
     //**********************************************
     public void showImageDialog()
@@ -161,9 +256,6 @@ public class ProfileFragment
                             mImageIntentURI);
                     Drawable d = new BitmapDrawable(getResources(), bitmap);
                     mBinding.profileImage.setImageDrawable(d);
-                    //showDataOnRecyclerView();
-
-
                 }
                 catch (IOException e)
                 {

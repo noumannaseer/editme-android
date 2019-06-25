@@ -48,6 +48,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
+
     <FrameLayout
         android:id="@+id/progress_view"
         android:layout_width="match_parent"

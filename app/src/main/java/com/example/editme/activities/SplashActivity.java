@@ -33,7 +33,6 @@ public class SplashActivity
         gotoWelcomeScreen();
     }
 
-    String[] a = new String[] { "sas", "sasa", "sasas", "sasasa" };
 
     //********************************************************************
     private void gotoWelcomeScreen()

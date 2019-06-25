@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -27,15 +27,17 @@
                 app:popupTheme="@style/AppTheme.PopupOverlay">
 
                 <TextView
-                    android:id="@+id/toolbar_title"
-                    android:layout_width="wrap_content"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:text="Select Package"
-                    android:textColor="#ffffff"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
+                    android:text="@string/select_package"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    app:layout_constraintTop_toTopOf="@+id/horizontal_cycle" />
+
             </androidx.appcompat.widget.Toolbar>
 
         </com.google.android.material.appbar.AppBarLayout>
@@ -44,10 +46,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="@color/primaryColor">
+
+            </LinearLayout>
+
             <com.gigamole.infinitecycleviewpager.HorizontalInfiniteCycleViewPager
                 android:id="@+id/horizontal_cycle"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="match_parent"
                 android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp"
                 app:icvp_center_page_scale_offset="30dp"
@@ -61,6 +70,17 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/select_package"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="25sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="@+id/horizontal_cycle" />
+
+            <TextView
                 android:id="@+id/package_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -69,6 +89,7 @@
                 android:textAlignment="center"
                 android:textColor="@android:color/black"
                 android:textSize="25sp"
+                android:visibility="gone"
                 app:layout_constraintBottom_toTopOf="@+id/packages_detail"
                 tools:layout_editor_absoluteX="30dp" />
 
@@ -80,6 +101,7 @@
                 android:layout_marginBottom="8dp"
                 android:text="this is package one detail."
                 android:textAlignment="center"
+                android:visibility="gone"
                 app:layout_constraintBottom_toTopOf="@+id/cardView"
                 tools:layout_editor_absoluteX="0dp" />
 
@@ -90,6 +112,7 @@
                 android:layout_marginBottom="20dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginStart="8dp"
+                android:visibility="gone"
                 app:cardBackgroundColor="@color/primaryColor"
                 app:cardCornerRadius="10dp"
                 app:layout_constraintBottom_toBottomOf="parent"

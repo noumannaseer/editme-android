@@ -7,7 +7,12 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_margin="10dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="5dp"
         android:elevation="4dp"
         android:orientation="vertical"
         app:cardCornerRadius="10dp">
@@ -27,9 +32,12 @@
                 android:layout_alignParentRight="true"
                 android:layout_marginEnd="5dp"
                 android:layout_marginTop="5dp"
+                android:elevation="111111dp"
                 android:src="@drawable/delete"
+                android:visibility="gone"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
 
             <ImageView
                 android:id="@+id/add_image"
@@ -37,6 +45,47 @@
                 android:layout_height="100dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/hourse" />
+
+            <LinearLayout
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/hourse">
+
+                <FrameLayout
+                    android:id="@+id/progress_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:elevation="500dp">
+
+                    <ProgressBar
+                        android:id="@+id/progress_bar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:indeterminateTint="@android:color/white"
+                        android:visibility="gone" />
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/upload_completed"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:elevation="5000dp"
+                        android:visibility="gone"
+                        app:cardCornerRadius="15dp">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="center"
+                            android:elevation="500000dp"
+                            android:src="@drawable/image_ipload_complete" />
+                    </androidx.cardview.widget.CardView>
+
+                </FrameLayout>
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/description"
