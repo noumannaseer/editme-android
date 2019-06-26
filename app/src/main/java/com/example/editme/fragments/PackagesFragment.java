@@ -86,7 +86,6 @@ public class PackagesFragment
         lstImages.add(
                 new PackagesDetails("Package 3", "package 3 descrption", 300, R.drawable.meggan));
 
-
         CircularImageSliderAdapter adapter = new CircularImageSliderAdapter(lstImages,
                                                                             getActivity(),
                                                                             PackagesFragment.this);
@@ -104,5 +103,10 @@ public class PackagesFragment
         mBinding.packagesDetail.setText(packagesDetail.getPackageDescription());
         mBinding.packagesPrice.setText("$" + packagesDetail.getPrice());
 
+    }
+
+    @Override
+    public void onPurchaseClick()
+    {
     }
 }

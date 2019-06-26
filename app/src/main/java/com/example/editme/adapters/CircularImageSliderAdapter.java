@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.editme.R;
@@ -53,10 +54,18 @@ public class CircularImageSliderAdapter
     {
         if (mListener != null)
             mListener.onImageSlide(position);
-        View view = layoutInflater.inflate(R.layout.list_view_images, container, false);
-        ImageView imageView = (ImageView)view.findViewById(R.id.add_image);
-        imageView.setImageResource(lstImages.get(position)
-                                            .getImageResourceId());
+        View view = layoutInflater.inflate(R.layout.list_view_packages, container, false);
+        //ImageView imageView = view.findViewById(R.id.add_image);
+        //imageView.setImageResource(lstImages.get(position)
+        //.getImageResourceId());
+
+        Button purchaseButton = view.findViewById(R.id.purchase);
+        purchaseButton.setOnClickListener(view1 -> {
+            if (mListener != null)
+            {
+                mListener.onPurchaseClick();
+            }
+        });
         container.addView(view);
         return view;
     }
@@ -64,5 +73,7 @@ public class CircularImageSliderAdapter
     public interface CircularSliderListener
     {
         void onImageSlide(int position);
+
+        void onPurchaseClick();
     }
 }

@@ -16,10 +16,10 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <string name="elapsed_time_days_hour">%1$d days, %2$d hours</string>
-    <string name="elapsed_hour_minutes">%1$d hours, %2$d minutes</string>
-    <string name="elapsed_time_minutes">%d minutes</string>
-    <string name="elapsed_time_secounds">%1$d seconds ago</string>
+    <string name="elapsed_time_days_hour">%1$d days remaining</string>
+    <string name="elapsed_hour_minutes">%1$d hours remaining</string>
+    <string name="elapsed_time_minutes">%d minutes remaining</string>
+    <string name="elapsed_time_secounds">%1$d seconds remaining</string>
     <string name="signup">SignUp</string>
     <string name="sign_up_to_edit_me">Sign Up to Edit Me</string>
     <string name="name">Name</string>
@@ -49,7 +49,7 @@
     <string name="edit_image_message">EVERYTHING YOU NEED FOR PHOTO EDITING, WITHOUT THE COMPLEX DESIGN SOFTWARE INSTALLATION</string>
     <string name="place_your_order_now">Place your order now</string>
     <string name="profile">Profile</string>
-    <string name="my_order_history">My order history</string>
+    <string name="my_order_history">Order history</string>
     <string name="older">Older</string>
     <string name="settings">Settings</string>
     <string name="general">General</string>
@@ -88,7 +88,7 @@
     <string name="please_add_image">Please add image first</string>
     <string name="total_images">Total images</string>
     <string name="remaining_images">Remaining images</string>
-    <string name="delivery_time">Deliver time</string>
+    <string name="delivery_time">Delivery time</string>
 
 
     <string name="camera_button_text">Upload</string>
@@ -128,6 +128,23 @@
     <string name="fb_login_successs">FaceBook Login Successfully</string>
     <string name="fb_login_cancel">FaceBook Login Cancel</string>
     <string name="google_signin_failed">Google sign in failed</string>
+    <string name="photo_count_template">%1$d Photos</string>
+    <string name="view_images">View images</string>
+    <string name="completed">Completed</string>
+    <string name="order_updated">Your order is updated</string>
+
+    <string name="standard_date_format">DD/MM/YY</string>
+    <string name="please_select_a_valid_date_order">Please select a valid order date</string>
+    <string name="cancel">@android:string/cancel</string>
+    <string name="select_package">Select package</string>
+    <string name="no_order_completed_yet">No order completed yet</string>
+    <string name="no_order_found">No order found</string>
+    <string name="create_order">Create order</string>
+    <string name="description">Description</string>
+    <string name="days4">&#160;Days</string>
+    <string name="select_picture">Select Picture</string>
+    <string name="google_pay_is_available">google pay is available</string>
+    <string name="is_ready_to_pay_failed">isReadyToPay failed</string>
 
 
 </resources>

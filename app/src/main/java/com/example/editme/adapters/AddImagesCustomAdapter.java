@@ -28,15 +28,18 @@ public class AddImagesCustomAdapter
     private ImageClickListener mImageClickListener;
     private boolean mShowDeleteIcon;
     private Activity mActivity;
+    private boolean mShowProgress;
 
     //**********************************************
-    public AddImagesCustomAdapter(List<EditImage> imagesList, ImageClickListener imageClickListener, boolean showDeleteIcon, Activity activity)
+    public AddImagesCustomAdapter(List<EditImage> imagesList, ImageClickListener imageClickListener, boolean showDeleteIcon, Activity activity, boolean showProgress)
     //**********************************************
     {
         mImagesList = imagesList;
         mImageClickListener = imageClickListener;
         mShowDeleteIcon = showDeleteIcon;
         mActivity = activity;
+        mShowDeleteIcon = showDeleteIcon;
+        mShowProgress = showProgress;
 
     }
 
@@ -80,6 +83,21 @@ public class AddImagesCustomAdapter
         final val item = mImagesList
                 .get(position);
 
+
+        if (item.isUploading() == 0 && mShowProgress == true)
+            holder.mBinding.progressBar.setVisibility(View.VISIBLE);
+        else if (item.isUploading() == 1 && mShowProgress == true)
+        {
+            holder.mBinding.progressBar.setVisibility(View.GONE);
+            holder.mBinding.progressView.setVisibility(View.VISIBLE);
+            holder.mBinding.uploadCompleted.setVisibility(View.VISIBLE);
+        }
+        else if (item.isUploading() == -1)
+        {
+            holder.mBinding.progressView.setVisibility(View.GONE);
+        }
+
+
         holder.mBinding.addImage.setImageDrawable(item.getImageDrawable(mActivity));
         holder.mBinding.description.setText(item.getDescription());
 
@@ -87,16 +105,16 @@ public class AddImagesCustomAdapter
             if (mImageClickListener != null)
                 mImageClickListener.onImageClick(position);
         });
-
         if (!mShowDeleteIcon)
             holder.mBinding.remove.setVisibility(View.GONE);
         else
+        {
+            holder.mBinding.remove.setVisibility(View.VISIBLE);
             holder.mBinding.remove.setOnClickListener(view -> {
                 if (mImageClickListener != null)
                     mImageClickListener.onImageDelete(position);
-
             });
-
+        }
     }
 
 

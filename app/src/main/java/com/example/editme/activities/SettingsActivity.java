@@ -57,11 +57,10 @@ public class SettingsActivity
         mBinding.userNameLayout.setOnClickListener(view -> gotoUpdateNameScreen(false));
         mBinding.emailLayout.setOnClickListener(view -> gotoUpdateNameScreen(true));
         mBinding.changePasswordLayout.setOnClickListener(view -> gotoUpdatePasswordScreen());
-        mBinding.paymentsLayout.setOnClickListener(view ->
-                                                   {
-                                                       UIUtils.testToast(false,
-                                                                         "Package is not subscribed");
-                                                   });
+        mBinding.paymentsLayout.setOnClickListener(view -> {
+            UIUtils.testToast(false,
+                              "Package is not subscribed");
+        });
         mBinding.logoutLayout.setOnClickListener(view -> logoutUser());
 
     }
@@ -118,7 +117,8 @@ public class SettingsActivity
                                                    LoginManager.getInstance()
                                                                .logOut();
                                                    googleLogout();
-                                                   SettingsActivity.super.onBackPressed();
+                                                   openHomeActivity();
+//                                                   SettingsActivity.super.onBackPressed();
                                                }
                                            }
                                        }, AndroidUtil.getString(R.string.yes),
@@ -126,6 +126,14 @@ public class SettingsActivity
 
         });
 
+    }
+
+    private void openHomeActivity()
+    {
+        Intent homeIntent = new Intent(this, HomeActivity.class);
+        homeIntent.setFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(homeIntent);
     }
 
     private void googleLogout()

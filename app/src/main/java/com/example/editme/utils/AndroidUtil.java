@@ -768,8 +768,7 @@ public class AndroidUtil
         {
             NetworkInfo netInfos = connectivityManager.getActiveNetworkInfo();
             if (netInfos != null)
-                if (netInfos.isConnected())
-                    return true;
+                return netInfos.isConnected();
         }
         return false;
     }
@@ -804,7 +803,7 @@ public class AndroidUtil
 
 
     public static Bitmap getThumbnail(Uri uri)
-            throws FileNotFoundException, IOException
+            throws IOException
     {
         InputStream input = AndroidUtil.getApplicationContext()
                                        .getContentResolver()
@@ -872,10 +871,7 @@ public class AndroidUtil
         {
             NetworkInfo netInfos = connectivityManager.getActiveNetworkInfo();
             if (netInfos != null)
-                if (netInfos.isConnected())
-                    return true;
-                else
-                    return false;
+                return netInfos.isConnected();
 
         }
         return false;

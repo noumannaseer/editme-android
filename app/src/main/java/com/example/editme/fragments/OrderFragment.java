@@ -3,14 +3,8 @@ package com.example.editme.fragments;
 
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.AndroidException;
-import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,29 +24,13 @@ import com.example.editme.model.User;
 import com.example.editme.utils.AndroidUtil;
 import com.example.editme.utils.Constants;
 import com.example.editme.utils.UIUtils;
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookActivity;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.solver.widgets.Analyzer;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import lombok.NonNull;
@@ -97,8 +75,9 @@ public class OrderFragment
         {
             mBinding = FragmentOrderBinding.inflate(inflater, container, false);
             mRootView = mBinding.getRoot();
+            initControls();
+
         }
-        initControls();
         return mRootView;
     }
 
@@ -106,6 +85,12 @@ public class OrderFragment
     private void initControls()
     //*********************************************************************
     {
+
+        if (EditMe.instance()
+                  .getMAuth()
+                  .getCurrentUser() == null)
+            displayLoginDialog();
+
         mBinding.placeOrder.setOnClickListener(view -> {
             if (EditMe.instance()
                       .getMAuth()
@@ -115,8 +100,7 @@ public class OrderFragment
                 val user = EditMe.instance()
                                  .getMAuth()
                                  .getCurrentUser();
-                val a = EditMe.instance()
-                              .isFaceBookLogin();
+
                 if (!UIUtils.getPackageStatus())
                 {
                     gotoPackagesScreen();
@@ -129,7 +113,9 @@ public class OrderFragment
         });
     }
 
+    //*************************************************************************************
     private void gotoPackagesScreen()
+    //*************************************************************************************
     {
         Intent packagesIntent = new Intent(getActivity(), PackagesActivity.class);
         startActivity(packagesIntent);
@@ -190,13 +176,14 @@ public class OrderFragment
 
         mLoginDialogBinding.btnGoogleplus.setOnClickListener(view -> {
             mLoginDialog.dismiss();
-            ;
             gotoGoogleSignInScreen();
         });
 
     }
 
+    //*************************************************************************************
     private void gotoGoogleSignInScreen()
+    //*************************************************************************************
     {
         Intent googleSignInIntent = new Intent(getActivity(), GoogleSignInActivity.class);
         startActivity(googleSignInIntent);
@@ -228,8 +215,6 @@ public class OrderFragment
                                                .toString();
         mPassword = mLoginDialogBinding.password.getText()
                                                 .toString();
-
-
         if (TextUtils.isEmpty(mEmail))
         {
             mLoginDialogBinding.loginEmail.setError(AndroidUtil.getString(R.string.required));
@@ -319,6 +304,8 @@ public class OrderFragment
                           UIUtils.testToast(false, "login successfulls");
                           mLoginDialog.dismiss();
                           mLoginDialogBinding.progressView.setVisibility(View.GONE);
+                          EditMe.instance()
+                                .loadUserDetail();
 
                       }
                   }
@@ -491,7 +478,6 @@ public class OrderFragment
                   }
               });
     }
-
 
     //**********************************************
     interface AccountRegistrationListener
