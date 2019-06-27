@@ -30,6 +30,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -300,8 +304,30 @@ public class OrderFragment
                       {
 
 
+                          String instanceId = FirebaseInstanceId.getInstance()
+                                                                .getToken();
+                          AndroidUtil.toast(false, instanceId);
+                          Map<String, Object> fcmToken = new HashMap<>();
+                          fcmToken.put(Constants.FCM_TOKEN, instanceId);
+                          EditMe.instance()
+                                .getMFireStore()
+                                .collection(Constants.Users)
+                                .document(EditMe.instance()
+                                                .getMUserId())
+                                .update(fcmToken)
+                                .addOnCompleteListener(
+                                        new OnCompleteListener<Void>()
+                                        {
+                                            @Override
+                                            public void onComplete(@androidx.annotation.NonNull Task<Void> task)
+                                            {
+
+                                                AndroidUtil.toast(false, "Login successfully");
+                                            }
+                                        });
+
                           UIUtils.setUserRemember(true);
-                          UIUtils.testToast(false, "login successfulls");
+//F                          UIUtils.testToast(false, "login successfulls");
                           mLoginDialog.dismiss();
                           mLoginDialogBinding.progressView.setVisibility(View.GONE);
                           EditMe.instance()
