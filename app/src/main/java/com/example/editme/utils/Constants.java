@@ -18,6 +18,9 @@ public class Constants
     public static final String ORDER_IMAGES = "order_images";
     public static final String DOWNLOAD_COMPLETE = "downloadComplete";
     public static final String FCM_TOKEN = "fcmToken";
+    public static final String ORDER_ID = "orderId";
+    public static final String USER_PHOTOS = "user_photos";
+    public static final String DISPLAY_NAME = "displayName";
 
     //Notification parameter
     public static String VERBOSE_NOTIFICATION_CHANNEL_DESCRIPTION = "Shows notifications whenever work starts";

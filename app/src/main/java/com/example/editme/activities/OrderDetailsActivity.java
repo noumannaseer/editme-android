@@ -18,7 +18,9 @@ import com.example.editme.utils.AndroidUtil;
 import com.example.editme.utils.Constants;
 import com.example.editme.utils.UIUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,6 +30,7 @@ import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import lombok.val;
 
 
 //*********************************************************************
@@ -38,6 +41,7 @@ public class OrderDetailsActivity
 {
 
 
+    public static final String ORDER_ID = "ORDER_ID";
     private static final int PERMISSION_REQUEST_CODE = 1220;
     private ActivityOrderDetailsBinding mBinding;
     private Order mOrder;
@@ -62,7 +66,8 @@ public class OrderDetailsActivity
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getParcelable();
-        setData();
+
+
         //    showDataOnRecyclerView();
         //   mBinding.viewImages.setOnClickListener(view -> gotoSliderScreen());
         mBinding.modifyOrder.setOnClickListener(view -> gotoPlaceOrderScreen());
@@ -82,8 +87,11 @@ public class OrderDetailsActivity
             }
             super.onBackPressed();
         });
-        showImagesOnRecyclerView();
-
+        if (mOrder != null)
+        {
+            setData();
+            showImagesOnRecyclerView();
+        }
     }
 
     //*************************************************************************************
@@ -166,6 +174,7 @@ public class OrderDetailsActivity
         mBinding.totalImages.setText(AndroidUtil.getString(R.string.photo_count_template,
                                                            mOrder.getImages()
                                                                  .size()));
+
     }
 
     //*************************************************************************************
@@ -185,6 +194,28 @@ public class OrderDetailsActivity
                 mBinding.completeOrder.setVisibility(View.GONE);
             }
 
+        }
+        else if (getIntent().getExtras()
+                            .containsKey(ORDER_ID))
+        {
+            val orderId = getIntent().getExtras()
+                                     .getString(ORDER_ID);
+            EditMe.instance()
+                  .getMFireStore()
+                  .collection(Constants.ORDERS)
+                  .document(orderId)
+                  .get()
+                  .addOnSuccessListener(
+                          new OnSuccessListener<DocumentSnapshot>()
+                          {
+                              @Override
+                              public void onSuccess(DocumentSnapshot documentSnapshot)
+                              {
+                                  mOrder = documentSnapshot.toObject(Order.class);
+                                  setData();
+                                  showImagesOnRecyclerView();
+                              }
+                          });
         }
     }
 

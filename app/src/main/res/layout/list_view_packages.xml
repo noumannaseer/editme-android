@@ -79,7 +79,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="50dp"
-                    android:background="#F3F3F3" />
+                    android:background="@color/medium_grey" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -96,7 +96,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginBottom="20sp"
-                    android:background="#F3F3F3" />
+                    android:background="@color/medium_grey" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 

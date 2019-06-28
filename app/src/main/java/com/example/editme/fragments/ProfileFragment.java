@@ -10,7 +10,6 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,16 +26,20 @@ import com.example.editme.activities.HomeActivity;
 import com.example.editme.activities.SettingsActivity;
 import com.example.editme.adapters.OrdersCustomAdapter;
 import com.example.editme.databinding.FragmentProfileBinding;
-import com.example.editme.model.EditImage;
 import com.example.editme.model.Order;
 import com.example.editme.model.User;
 import com.example.editme.utils.AndroidUtil;
 import com.example.editme.utils.Constants;
 import com.example.editme.utils.UIUtils;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.IOException;
@@ -82,8 +85,10 @@ public class ProfileFragment
     public HomeActivity mHomeActivity;
 
 
+    //********************************************************************************
     @Override
     public void onAttach(@NonNull Activity activity)
+    //********************************************************************************
     {
         super.onAttach(activity);
         mHomeActivity = (HomeActivity)activity;
@@ -123,12 +128,15 @@ public class ProfileFragment
         UIUtils.loadImages(mUser.getPhotoUrl(), mBinding.profileImage,
                            AndroidUtil.getDrawable(R.drawable.ic_person_black_24dp));
         mBinding.userName.setText(mUser.getDisplayName());
-        mBinding.profileImage.setOnClickListener(view -> showImageDialog());
+        if (UIUtils.getLoginType() == 2)
+            mBinding.profileImage.setOnClickListener(view -> showImageDialog());
         getCompletedOrder();
 
     }
 
+    //********************************************************************************
     private void getCompletedOrder()
+    //********************************************************************************
     {
         showProgressView();
         if (EditMe.instance()
@@ -254,8 +262,10 @@ public class ProfileFragment
                     val bitmap = MediaStore.Images.Media.getBitmap(
                             getActivity().getContentResolver(),
                             mImageIntentURI);
+
                     Drawable d = new BitmapDrawable(getResources(), bitmap);
                     mBinding.profileImage.setImageDrawable(d);
+                    updateUserImage();
                 }
                 catch (IOException e)
                 {
@@ -264,6 +274,73 @@ public class ProfileFragment
             }
 
         }
+        else
+        {
+            mBinding.userName.setText(EditMe.instance()
+                                            .getMUserDetail()
+                                            .getDisplayName());
+        }
+
+    }
+
+    private void updateUserImage()
+    {
+        val mStorage = EditMe.instance()
+                             .getMStorageReference()
+                             .getReference();
+        StorageReference filePath = mStorage.child(Constants.USER_PHOTOS)
+                                            .child(EditMe.instance()
+                                                         .getMUserId());
+
+        showProgressView();
+
+        Task<Uri> uriTask = filePath.putFile(mImageIntentURI)
+                                    .continueWithTask(
+                                            new Continuation<UploadTask.TaskSnapshot, Task<Uri>>()
+                                            {
+                                                @Override
+                                                public Task<Uri> then(@lombok.NonNull Task<UploadTask.TaskSnapshot> task)
+                                                        throws Exception
+                                                {
+                                                    if (!task.isSuccessful())
+                                                    {
+                                                        AndroidUtil.toast(false, task.getException()
+                                                                                     .toString());
+                                                        throw task.getException();
+                                                    }
+                                                    return filePath.getDownloadUrl();
+                                                }
+                                            })
+                                    .addOnCompleteListener(new OnCompleteListener<Uri>()
+                                    {
+                                        @Override
+                                        public void onComplete(@lombok.NonNull Task<Uri> task)
+                                        {
+                                            if (task.isSuccessful())
+                                            {
+                                                mImageIntentURI = task.getResult();
+                                                val userDetail = EditMe.instance()
+                                                                       .getMUserDetail();
+                                                userDetail.setPhotoUrl(mImageIntentURI.toString());
+                                                EditMe.instance()
+                                                      .getMFireStore()
+                                                      .collection(Constants.Users)
+                                                      .document(userDetail.getUid())
+                                                      .set(userDetail)
+                                                      .addOnSuccessListener(
+                                                              new OnSuccessListener<Void>()
+                                                              {
+                                                                  @Override
+                                                                  public void onSuccess(Void aVoid)
+                                                                  {
+                                                                      hideProgressView();
+                                                                  }
+                                                              });
+
+                                                //   Log.d(TAG, "onComplete: Url: " + downUri.toString());
+                                            }
+                                        }
+                                    });
 
     }
 
@@ -282,7 +359,7 @@ public class ProfileFragment
     private void gotoSettingsScreen()
     {
         Intent settingsIntent = new Intent(getActivity(), SettingsActivity.class);
-        startActivity(settingsIntent);
+        startActivityForResult(settingsIntent, 0);
 
     }
 

@@ -306,7 +306,6 @@ public class OrderFragment
 
                           String instanceId = FirebaseInstanceId.getInstance()
                                                                 .getToken();
-                          AndroidUtil.toast(false, instanceId);
                           Map<String, Object> fcmToken = new HashMap<>();
                           fcmToken.put(Constants.FCM_TOKEN, instanceId);
                           EditMe.instance()
@@ -321,7 +320,6 @@ public class OrderFragment
                                             @Override
                                             public void onComplete(@androidx.annotation.NonNull Task<Void> task)
                                             {
-
                                                 AndroidUtil.toast(false, "Login successfully");
                                             }
                                         });
@@ -332,12 +330,10 @@ public class OrderFragment
                           mLoginDialogBinding.progressView.setVisibility(View.GONE);
                           EditMe.instance()
                                 .loadUserDetail();
-
                       }
                   }
                   else
                   {
-
                       UIUtils.displayAlertDialog(
                               AndroidUtil.getString(R.string.invalid_email_password),
                               getString(R.string.login_error),

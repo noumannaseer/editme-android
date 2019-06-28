@@ -29,6 +29,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.editme.R;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserInfo;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -688,5 +690,24 @@ public class UIUtils
             builder.append(ALPHA_NUMERIC_STRING.charAt(character));
         }
         return builder.toString();
+    }
+
+    public static int getLoginType()
+    {
+        UserInfo user = FirebaseAuth.getInstance()
+                                    .getCurrentUser()
+                                    .getProviderData()
+                                    .get(1);
+        //  {
+        if (user.getProviderId()
+                .equals("facebook.com"))
+            return 0;
+        else if (user.getProviderId()
+                     .equals("google.com"))
+            return 1;
+     /*   else if (user.getProviderId()
+                     .equals("firebase"))
+     */       return 2;
+
     }
 }

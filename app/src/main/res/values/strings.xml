@@ -145,6 +145,8 @@
     <string name="select_picture">Select Picture</string>
     <string name="google_pay_is_available">google pay is available</string>
     <string name="is_ready_to_pay_failed">isReadyToPay failed</string>
+    <string name="incorrect_password">Incorrect password</string>
+    <string name="password_updated">password updated</string>
 
 
 </resources>

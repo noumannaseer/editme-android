@@ -5,11 +5,19 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
+import com.example.editme.EditMe;
 import com.example.editme.R;
 import com.example.editme.databinding.ActivityUpdateNameEmailBinding;
 import com.example.editme.utils.AndroidUtil;
+import com.example.editme.utils.Constants;
 import com.example.editme.utils.UIUtils;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
@@ -42,13 +50,7 @@ public class UpdateNameEmailActivity
     {
         setTab();
         getParcelable();
-        if (mIsEmailUpdate)
-        {
-            mBinding.updateValue.setHint(AndroidUtil.getString(R.string.new_email));
-            mBinding.toolbarTitle.setText(AndroidUtil.getString(R.string.update_email));
-            mBinding.update.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-        }
-        mBinding.update.setOnClickListener(view -> updateField());
+        mBinding.updateName.setOnClickListener(view -> updateField());
 
     }
 
@@ -79,30 +81,40 @@ public class UpdateNameEmailActivity
     private void updateField()
     //****************************************************************************
     {
-        val fieldData = mBinding.updateValue.getText()
-                                            .toString();
-        if (TextUtils.isEmpty(fieldData))
+        val name = mBinding.userName.getText()
+                                    .toString();
+        if (TextUtils.isEmpty(name))
         {
-            mBinding.updateValue.setError(AndroidUtil.getString(R.string.required));
+            mBinding.userName.setError(AndroidUtil.getString(R.string.required));
             return;
         }
-        else if (!UIUtils.isValidEmailId(fieldData) && mIsEmailUpdate)
-        {
-            mBinding.updateValue.setError(AndroidUtil.getString(R.string.incorrect_email_format));
-            return;
-
-        }
-        if (mIsEmailUpdate)
-            updateEmail();
-        else
-            updateName();
+        updateName(name);
     }
 
 
     //****************************************************************************
-    private void updateName()
+    private void updateName(String name)
     //****************************************************************************
     {
+        Map<String, Object> updateName = new HashMap<>();
+        updateName.put(Constants.DISPLAY_NAME, name);
+        EditMe.instance()
+              .getMFireStore()
+              .collection(Constants.Users)
+              .document(EditMe.instance()
+                              .getMUserId())
+              .update(updateName)
+              .addOnCompleteListener(new OnCompleteListener<Void>()
+              {
+                  @Override
+                  public void onComplete(@NonNull Task<Void> task)
+                  {
+                      if (task.isSuccessful())
+                      {
+                          finish();
+                      }
+                  }
+              });
         UIUtils.testToast(false, AndroidUtil.getString(R.string.name_updated));
         finish();
 
