@@ -18,7 +18,8 @@ public class Order
     private Timestamp dueDate;
     private List<OrderImages> images;
     private String orderId;
-
+    private String uid;
+    private double price;
 
     protected Order(Parcel in)
     {
@@ -30,6 +31,29 @@ public class Order
         dueDate = in.readParcelable(Timestamp.class.getClassLoader());
         images = in.createTypedArrayList(OrderImages.CREATOR);
         orderId = in.readString();
+        uid = in.readString();
+        price = in.readDouble();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeString(email);
+        dest.writeString(title);
+        dest.writeString(status);
+        dest.writeString(description);
+        dest.writeParcelable(orderDate, flags);
+        dest.writeParcelable(dueDate, flags);
+        dest.writeTypedList(images);
+        dest.writeString(orderId);
+        dest.writeString(uid);
+        dest.writeDouble(price);
+    }
+
+    @Override
+    public int describeContents()
+    {
+        return 0;
     }
 
     public static final Creator<Order> CREATOR = new Creator<Order>()
@@ -117,21 +141,6 @@ public class Order
         this.images = images;
     }
 
-    public Order()
-    {
-    }
-
-    public Order(String email, String title, String status, String description, Timestamp orderDate, Timestamp dueDate, List<OrderImages> images)
-    {
-        this.email = email;
-        this.title = title;
-        this.status = status;
-        this.description = description;
-        this.orderDate = orderDate;
-        this.dueDate = dueDate;
-        this.images = images;
-    }
-
     public String getOrderId()
     {
         return orderId;
@@ -142,7 +151,27 @@ public class Order
         this.orderId = orderId;
     }
 
-    public Order(String email, String title, String status, String description, Timestamp orderDate, Timestamp dueDate, List<OrderImages> images, String orderId)
+    public String getUid()
+    {
+        return uid;
+    }
+
+    public void setUid(String uid)
+    {
+        this.uid = uid;
+    }
+
+    public double getPrice()
+    {
+        return price;
+    }
+
+    public void setPrice(double price)
+    {
+        this.price = price;
+    }
+
+    public Order(String email, String title, String status, String description, Timestamp orderDate, Timestamp dueDate, List<OrderImages> images, String orderId, String uid, double price)
     {
         this.email = email;
         this.title = title;
@@ -152,24 +181,11 @@ public class Order
         this.dueDate = dueDate;
         this.images = images;
         this.orderId = orderId;
+        this.uid = uid;
+        this.price = price;
     }
 
-    @Override
-    public int describeContents()
+    public Order()
     {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags)
-    {
-        dest.writeString(email);
-        dest.writeString(title);
-        dest.writeString(status);
-        dest.writeString(description);
-        dest.writeParcelable(orderDate, flags);
-        dest.writeParcelable(dueDate, flags);
-        dest.writeTypedList(images);
-        dest.writeString(orderId);
     }
 }

@@ -11,11 +11,24 @@ public class OrderImages
 
     private String description;
     private String url;
+    private String image_id;
+
+    public OrderImages()
+    {
+    }
+
+    public OrderImages(String description, String url, String image_id)
+    {
+        this.description = description;
+        this.url = url;
+        this.image_id = image_id;
+    }
 
     protected OrderImages(Parcel in)
     {
         description = in.readString();
         url = in.readString();
+        image_id = in.readString();
     }
 
     public static final Creator<OrderImages> CREATOR = new Creator<OrderImages>()
@@ -53,16 +66,14 @@ public class OrderImages
         this.url = url;
     }
 
-
-    public OrderImages()
+    public String getImage_id()
     {
+        return image_id;
     }
 
-    public OrderImages(String description, String url)
+    public void setImage_id(String image_id)
     {
-        this.description = description;
-        this.url = url;
-
+        this.image_id = image_id;
     }
 
     @Override
@@ -76,6 +87,7 @@ public class OrderImages
     {
         dest.writeString(description);
         dest.writeString(url);
+        dest.writeString(image_id);
     }
 }
 

@@ -9,6 +9,7 @@ import com.example.editme.R;
 import com.example.editme.databinding.ActivityLoginBinding;
 import com.example.editme.utils.AndroidUtil;
 import com.example.editme.utils.UIUtils;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
@@ -93,6 +94,7 @@ public class LoginActivity
     private void gotoHomeScreen()
     //**************************************************************
     {
+
         Intent homeIntent = new Intent(this, HomeActivity.class);
         homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(homeIntent);

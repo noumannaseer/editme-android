@@ -240,7 +240,7 @@ public class CheckOutActivity
                                                                             finalI)
                                                                                   .getDescription(),
                                                                     task.getResult()
-                                                                        .toString()));
+                                                                        .toString(), ""));
                                                     mEditImageList.get(finalI)
                                                                   .setUploading(1);
                                                     mAddImagesCustomAdapter.notifyItemChanged(
@@ -274,7 +274,8 @@ public class CheckOutActivity
                               new Timestamp(new Date()),
                               new Timestamp(mDueDate),
                               mOrderImageList,
-                              "" + orderId);
+                              "" + orderId, EditMe.instance()
+                                                  .getMUserId(), 0);
         EditMe.instance()
               .getMFireStore()
               .collection(Constants.ORDERS)
