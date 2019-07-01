@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import com.google.firebase.Timestamp;
 
+import androidx.databinding.BaseObservable;
+
 public class User
         implements Parcelable
 {
