@@ -95,6 +95,7 @@ public class PackagesActivity
 
     private void getPackagesList()
     {
+        showProgressView();
 
         EditMe.instance()
               .getMFireStore()
@@ -112,6 +113,7 @@ public class PackagesActivity
                           PackagesDetails packagesDetails = child.toObject(PackagesDetails.class);
                           mPackagesList.add(packagesDetails);
                       }
+                      hideProgressView();
                       showDataOnRecyclerView();
                   }
 
@@ -164,6 +166,7 @@ public class PackagesActivity
                   {
                       AndroidUtil.toast(false,
                                         AndroidUtil.getString(R.string.package_buy_successfully));
+                      finish();
                   }
               });
        /* requestPayment(getWindow().getDecorView()
@@ -225,6 +228,23 @@ public class PackagesActivity
             AutoResolveHelper.resolveTask(
                     mPaymentsClient.loadPaymentData(request), this, LOAD_PAYMENT_DATA_REQUEST_CODE);
         }
+    }
+
+
+    //*****************************************
+    private void showProgressView()
+    //*****************************************
+    {
+        mBinding.progressView.setVisibility(View.VISIBLE);
+
+    }
+
+    //*****************************************
+    private void hideProgressView()
+    //*****************************************
+    {
+        mBinding.progressView.setVisibility(View.GONE);
+
     }
 
     //**********************************************************************
