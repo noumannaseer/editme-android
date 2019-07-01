@@ -14,6 +14,7 @@
         android:roundIcon="@mipmap/editme_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".activities.CurrentPackageActivity"></activity>
         <activity
             android:name=".activities.ImageSliderActivity"
             android:screenOrientation="portrait"
@@ -57,10 +58,10 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.HomeActivity"
-
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="MATRIMONY" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -118,22 +119,18 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/notification_icon" />
-
         <meta-data
             android:name="com.google.android.gms.wallet.api.enabled"
             android:value="true" />
 
         <service android:name=".services.retrofit_image_download_service.BackgroundNotificationService" />
-
         <service
             android:name=".fcm.MessagingService"
             tools:ignore="ExportedService">
-
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-
     </application>
 
 </manifest>

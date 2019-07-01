@@ -81,11 +81,8 @@ dependencies {
     implementation 'com.github.JakeWharton:ViewPagerIndicator:2.4.1'
 
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
-    implementation 'com.squareup.picasso:picasso:2.71828'
 
     implementation 'com.google.firebase:firebase-messaging:18.0.0'
-
-
 
 
     // Google play services for location information

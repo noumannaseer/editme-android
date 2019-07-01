@@ -3,6 +3,8 @@ package com.example.editme.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.firebase.Timestamp;
+
 public class User
         implements Parcelable
 {
@@ -10,6 +12,18 @@ public class User
     private String email;
     private String uid;
     private String photoUrl;
+    private PackagesDetails currentPackage;
+
+
+    public User(String displayName, String email, String uid, String photoUrl, PackagesDetails currentPackage)
+    {
+        this.displayName = displayName;
+        this.email = email;
+        this.uid = uid;
+        this.photoUrl = photoUrl;
+        this.currentPackage = currentPackage;
+    }
+
 
     public User(String displayName, String email, String uid, String photoUrl)
     {
@@ -55,6 +69,8 @@ public class User
         displayName = in.readString();
         email = in.readString();
         uid = in.readString();
+        currentPackage = in.readParcelable(PackagesDetails.class.getClassLoader());
+
     }
 
     public static final Creator<User> CREATOR = new Creator<User>()
@@ -105,5 +121,16 @@ public class User
         dest.writeString(displayName);
         dest.writeString(email);
         dest.writeString(uid);
+        dest.writeParcelable(currentPackage, flags);
+    }
+
+    public PackagesDetails getCurrentPackage()
+    {
+        return currentPackage;
+    }
+
+    public void setCurrentPackage(PackagesDetails currentPackage)
+    {
+        this.currentPackage = currentPackage;
     }
 }

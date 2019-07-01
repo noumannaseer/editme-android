@@ -81,11 +81,23 @@ public class SettingsActivity
         mBinding.emailLayout.setOnClickListener(view -> gotoUpdateNameScreen(true));
         mBinding.changePasswordLayout.setOnClickListener(view -> gotoUpdatePasswordScreen());
         mBinding.paymentsLayout.setOnClickListener(view -> {
-            UIUtils.testToast(false,
-                              "Package is not subscribed");
+
+            if (EditMe.instance()
+                      .getMUserDetail()
+                      .getCurrentPackage() == null)
+                UIUtils.testToast(false,
+                                  "Package is not subscribed");
+            else
+                gotoCurrentPackageScree();
         });
         mBinding.logoutLayout.setOnClickListener(view -> logoutUser());
 
+    }
+
+    private void gotoCurrentPackageScree()
+    {
+        Intent currenPackageIntent = new Intent(this, CurrentPackageActivity.class);
+        startActivity(currenPackageIntent);
     }
 
 

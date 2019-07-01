@@ -8,7 +8,6 @@ import com.example.editme.utils.Constants;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -39,7 +38,6 @@ public class EditMe
     @Getter private User mUserDetail;
     @Getter private FirebaseStorage mStorageReference;
 
-
     //**************************************************************************
     @Override
     public void onCreate()
@@ -58,7 +56,6 @@ public class EditMe
         AppEventsLogger.activateApp(this);
         mStorageReference = FirebaseStorage.getInstance();
         loadUserDetail();
-
     }
 
     //*********************************************************************

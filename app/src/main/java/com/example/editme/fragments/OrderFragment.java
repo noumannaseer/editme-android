@@ -309,6 +309,8 @@ public class OrderFragment
                           Map<String, Object> fcmToken = new HashMap<>();
                           fcmToken.put(Constants.FCM_TOKEN, instanceId);
                           EditMe.instance()
+                                .loadUserDetail();
+                          EditMe.instance()
                                 .getMFireStore()
                                 .collection(Constants.Users)
                                 .document(EditMe.instance()
@@ -406,7 +408,7 @@ public class OrderFragment
         {
             if (TextUtils.isEmpty(userId))
                 return;
-            val user = new User(mName, mEmail, userId);
+            val user = new User(mName, mEmail, userId, null, null);
             EditMe.instance()
                   .getMFireStore()
                   .collection(Constants.Users)

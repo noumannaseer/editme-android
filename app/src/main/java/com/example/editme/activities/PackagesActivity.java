@@ -1,34 +1,26 @@
 package com.example.editme.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.databinding.DataBindingUtil;
-import lombok.NonNull;
-import lombok.val;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.editme.EditMe;
 import com.example.editme.R;
 import com.example.editme.adapters.CircularImageSliderAdapter;
 import com.example.editme.databinding.ActivityPackagesBinding;
-import com.example.editme.databinding.FragmentPackagesBinding;
-import com.example.editme.fragments.OrderFragment;
-import com.example.editme.fragments.PackagesFragment;
 import com.example.editme.model.PackagesDetails;
 import com.example.editme.utils.AndroidUtil;
+import com.example.editme.utils.Constants;
 import com.example.editme.utils.PaymentsUtil;
 import com.example.editme.utils.UIUtils;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.wallet.AutoResolveHelper;
 import com.google.android.gms.wallet.IsReadyToPayRequest;
@@ -37,13 +29,23 @@ import com.google.android.gms.wallet.PaymentDataRequest;
 import com.google.android.gms.wallet.PaymentsClient;
 import com.google.android.gms.wallet.Wallet;
 import com.google.android.gms.wallet.WalletConstants;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.databinding.DataBindingUtil;
+import lombok.NonNull;
+import lombok.val;
 
 //*********************************************************************
 public class PackagesActivity
@@ -58,6 +60,7 @@ public class PackagesActivity
     private List<String> mUrlList;
     private static final int LOAD_PAYMENT_DATA_REQUEST_CODE = 991;
     private PaymentsClient mPaymentsClient;
+    private List<PackagesDetails> mPackagesList;
 
     //*********************************************************************
     @Override
@@ -74,8 +77,8 @@ public class PackagesActivity
     private void initControls()
     //*********************************************************************
     {
-        initData();
         setTab();
+        getPackagesList();
         mPaymentsClient =
                 Wallet.getPaymentsClient(
                         this,
@@ -90,25 +93,39 @@ public class PackagesActivity
         });
     }
 
-
-    List<PackagesDetails> lstImages;
-
-    //*********************************************************************
-    private void initData()
-    //*********************************************************************
-
+    private void getPackagesList()
     {
-        lstImages = new ArrayList<>();
 
-        lstImages.add(
-                new PackagesDetails("Package 1", "package 1 descrption", 150, R.drawable.cyclos));
-        lstImages.add(
-                new PackagesDetails("Package 2", "package 2 descrption", 250, R.drawable.night));
-        lstImages.add(
-                new PackagesDetails("Package 3", "package 3 descrption", 300, R.drawable.meggan));
+        EditMe.instance()
+              .getMFireStore()
+              .collection(Constants.PACKAGES)
+              .get()
+              .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
+              {
+                  @Override
+                  public void onSuccess(QuerySnapshot queryDocumentSnapshots)
+                  {
+
+                      mPackagesList = new ArrayList<PackagesDetails>();
+                      for (val child : queryDocumentSnapshots.getDocuments())
+                      {
+                          PackagesDetails packagesDetails = child.toObject(PackagesDetails.class);
+                          mPackagesList.add(packagesDetails);
+                      }
+                      showDataOnRecyclerView();
+                  }
+
+              });
+
+    }
 
 
-        CircularImageSliderAdapter adapter = new CircularImageSliderAdapter(lstImages,
+    //*********************************************************************
+    private void showDataOnRecyclerView()
+    //*********************************************************************
+    {
+
+        CircularImageSliderAdapter adapter = new CircularImageSliderAdapter(mPackagesList,
                                                                             this,
                                                                             this);
         mBinding.horizontalCycle.setAdapter(adapter);
@@ -119,7 +136,7 @@ public class PackagesActivity
     public void onImageSlide(int position)
     //*********************************************************************
     {
-        val packagesDetail = lstImages.get(position);
+        val packagesDetail = mPackagesList.get(position);
         mBinding.packageName.setText(packagesDetail.getPackageName());
         mBinding.packagesDetail.setText(packagesDetail.getPackageDescription());
         mBinding.packagesPrice.setText("$" + packagesDetail.getPrice());
@@ -127,10 +144,30 @@ public class PackagesActivity
     }
 
     @Override
-    public void onPurchaseClick()
+    public void onPurchaseClick(int position)
     {
-        requestPayment(getWindow().getDecorView()
-                                  .getRootView());
+
+        Map<String, Object> update = new HashMap<>();
+        update.put("currentPackage", mPackagesList.get(position));
+
+
+        EditMe.instance()
+              .getMFireStore()
+              .collection(Constants.Users)
+              .document(EditMe.instance()
+                              .getMUserId())
+              .update(update)
+              .addOnSuccessListener(new OnSuccessListener<Void>()
+              {
+                  @Override
+                  public void onSuccess(Void aVoid)
+                  {
+                      AndroidUtil.toast(false,
+                                        AndroidUtil.getString(R.string.package_buy_successfully));
+                  }
+              });
+       /* requestPayment(getWindow().getDecorView()
+                                  .getRootView());*/
         UIUtils.setPackageStatus(true);
 
     }

@@ -21,6 +21,7 @@ public class Constants
     public static final String ORDER_ID = "orderId";
     public static final String USER_PHOTOS = "user_photos";
     public static final String DISPLAY_NAME = "displayName";
+    public static final String PACKAGES = "packages";
 
     //Notification parameter
     public static String VERBOSE_NOTIFICATION_CHANNEL_DESCRIPTION = "Shows notifications whenever work starts";

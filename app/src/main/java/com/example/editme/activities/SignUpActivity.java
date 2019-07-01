@@ -41,7 +41,6 @@ public class SignUpActivity
     {
         setSupportActionBar(mBinding.toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-
         mBinding.btnLoginNow.setOnClickListener(view -> goToLoginScreen());
         mBinding.btnSignup.setOnClickListener(view -> signUpUser());
 

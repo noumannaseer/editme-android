@@ -159,7 +159,7 @@ public class GoogleSignInActivity
               .getMFireStore()
               .collection(Constants.Users)
               .document(userId)
-              .set(new User(displayName, email, userId, photoUrl))
+              .set(new User(displayName, email, userId, photoUrl, null))
               .addOnCompleteListener(
                       new OnCompleteListener<Void>()
                       {
