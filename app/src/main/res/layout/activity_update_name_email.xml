@@ -38,7 +38,7 @@
         </com.google.android.material.appbar.AppBarLayout>
 
         <EditText
-            android:id="@+id/update_value"
+            android:id="@+id/user_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
@@ -47,7 +47,7 @@
             android:singleLine="true" />
 
         <Button
-            android:id="@+id/update"
+            android:id="@+id/update_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"

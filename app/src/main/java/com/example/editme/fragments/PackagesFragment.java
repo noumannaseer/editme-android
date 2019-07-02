@@ -80,11 +80,11 @@ public class PackagesFragment
         lstImages = new ArrayList<>();
 
         lstImages.add(
-                new PackagesDetails("Package 1", "package 1 descrption", 150, R.drawable.cyclos));
+                new PackagesDetails("Package 1", "package 1 descrption", 150));
         lstImages.add(
-                new PackagesDetails("Package 2", "package 2 descrption", 250, R.drawable.night));
+                new PackagesDetails("Package 2", "package 2 descrption", 250));
         lstImages.add(
-                new PackagesDetails("Package 3", "package 3 descrption", 300, R.drawable.meggan));
+                new PackagesDetails("Package 3", "package 3 descrption", 300));
 
         CircularImageSliderAdapter adapter = new CircularImageSliderAdapter(lstImages,
                                                                             getActivity(),
@@ -106,7 +106,7 @@ public class PackagesFragment
     }
 
     @Override
-    public void onPurchaseClick()
+    public void onPurchaseClick(int position)
     {
     }
 }

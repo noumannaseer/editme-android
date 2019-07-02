@@ -1,5 +1,6 @@
 package com.example.editme.activities;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
@@ -11,7 +12,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.BoringLayout;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 
 import com.example.editme.EditMe;
@@ -25,6 +28,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FacebookAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserInfo;
 
 
 //*****************************************************************
@@ -51,6 +56,24 @@ public class SettingsActivity
     //*****************************************************************
     {
 
+
+    /*    for (UserInfo user : FirebaseAuth.getInstance()
+                                         .getCurrentUser()
+                                         .getProviderData())*/
+
+        UserInfo user = FirebaseAuth.getInstance()
+                                    .getCurrentUser()
+                                    .getProviderData()
+                                    .get(1);
+        //  {
+        mBinding.userName.setText(EditMe.instance()
+                                        .getMUserDetail()
+                                        .getDisplayName());
+        if (UIUtils.getLoginType() == 0)
+            hideNamePassword();
+        else if (UIUtils.getLoginType() == 1)
+            hideNamePassword();
+        // }
         setTab();
         mBinding.aboutUsLayout.setOnClickListener(view -> openAboutDialog());
         mBinding.privacyPolicyLayout.setOnClickListener(view -> gotoBrowserActivity());
@@ -58,10 +81,43 @@ public class SettingsActivity
         mBinding.emailLayout.setOnClickListener(view -> gotoUpdateNameScreen(true));
         mBinding.changePasswordLayout.setOnClickListener(view -> gotoUpdatePasswordScreen());
         mBinding.paymentsLayout.setOnClickListener(view -> {
-            UIUtils.testToast(false,
-                              "Package is not subscribed");
+
+            if (EditMe.instance()
+                      .getMUserDetail()
+                      .getCurrentPackage() == null)
+                UIUtils.testToast(false,
+                                  "Package is not subscribed");
+            else
+                gotoCurrentPackageScree();
         });
         mBinding.logoutLayout.setOnClickListener(view -> logoutUser());
+
+    }
+
+    private void gotoCurrentPackageScree()
+    {
+        Intent currenPackageIntent = new Intent(this, CurrentPackageActivity.class);
+        startActivity(currenPackageIntent);
+    }
+
+
+    //****************************************************************************************
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
+    //****************************************************************************************
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        mBinding.userName.setText(EditMe.instance()
+                                        .getMUserDetail()
+                                        .getDisplayName());
+    }
+
+    //****************************************************************************************
+    private void hideNamePassword()
+    //****************************************************************************************
+    {
+        mBinding.changePasswordLayout.setVisibility(View.GONE);
+        mBinding.userNameLayout.setVisibility(View.GONE);
 
     }
 
@@ -79,7 +135,7 @@ public class SettingsActivity
     {
         Intent updateIntent = new Intent(this, UpdateNameEmailActivity.class);
         updateIntent.putExtra(UpdateNameEmailActivity.UPDATE_FIELD, isEmailUpdate);
-        startActivity(updateIntent);
+        startActivityForResult(updateIntent, 0);
 
     }
 

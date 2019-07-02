@@ -8,13 +8,16 @@ import com.example.editme.utils.Constants;
 import com.facebook.AccessToken;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.storage.FirebaseStorage;
+
+import javax.annotation.Nullable;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -35,7 +38,6 @@ public class EditMe
     @Getter private User mUserDetail;
     @Getter private FirebaseStorage mStorageReference;
 
-
     //**************************************************************************
     @Override
     public void onCreate()
@@ -54,7 +56,6 @@ public class EditMe
         AppEventsLogger.activateApp(this);
         mStorageReference = FirebaseStorage.getInstance();
         loadUserDetail();
-
     }
 
     //*********************************************************************
@@ -89,16 +90,15 @@ public class EditMe
               .getMFireStore()
               .collection(Constants.Users)
               .document(mUserId)
-              .get()
-              .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>()
+              .addSnapshotListener(new EventListener<DocumentSnapshot>()
               {
                   @Override
-                  public void onSuccess(DocumentSnapshot documentSnapshot)
+                  public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e)
                   {
                       mUserDetail = documentSnapshot.toObject(User.class);
+
                   }
               });
-
     }
 
 }

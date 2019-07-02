@@ -21,6 +21,7 @@ public class Order
     private String uid;
     private double price;
 
+
     protected Order(Parcel in)
     {
         email = in.readString();

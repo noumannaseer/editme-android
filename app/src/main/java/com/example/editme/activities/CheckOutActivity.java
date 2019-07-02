@@ -21,6 +21,7 @@ import com.example.editme.utils.Constants;
 import com.example.editme.utils.UIUtils;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.storage.StorageReference;
@@ -69,11 +70,7 @@ public class CheckOutActivity
         super.onCreate(savedInstanceState);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_checkout);
         initControls();
-        if (mEditImageList != null)
-        {
-            showDataOnRecyclerView();
-            mBinding.description.setText("" + mOrderDescription);
-        }
+
     }
 
     //******************************************************************
@@ -86,6 +83,15 @@ public class CheckOutActivity
             showCalendar(mBinding.deliveryTime);
         });
 
+        if (mEditImageList != null)
+        {
+            showDataOnRecyclerView();
+            mBinding.remainingImages.setText("" + (EditMe.instance()
+                                                         .getMUserDetail()
+                                                         .getCurrentPackage()
+                                                         .getRemainingImages() - mEditImageList.size()));
+            mBinding.description.setText("" + mOrderDescription);
+        }
     }
 
     //*****************************************************************
@@ -170,7 +176,8 @@ public class CheckOutActivity
     private static long getUnitBetweenDates(Date startDate, Date endDate, TimeUnit unit)
     //**********************************************************************************
     {
-        long timeDiff = endDate.getTime() - startDate.getTime();
+        long timeDiff =
+                endDate.getTime() - startDate.getTime();
         return unit.convert(timeDiff, TimeUnit.MILLISECONDS);
     }
 
@@ -289,8 +296,29 @@ public class CheckOutActivity
                           {
                               if (task.isSuccessful())
                               {
-                                  UIUtils.testToast(false, "Order posted");
-                                  gotoBack();
+
+                                  val packagesDetails = EditMe.instance()
+                                                              .getMUserDetail()
+                                                              .getCurrentPackage();
+                                  packagesDetails.decrement(mEditImageList.size());
+                                  val userId = EditMe.instance()
+                                                     .getMUserId();
+                                  EditMe.instance()
+                                        .getMFireStore()
+                                        .collection(Constants.Users)
+                                        .document(userId)
+                                        .update("currentPackage", packagesDetails)
+                                        .addOnSuccessListener(
+                                                new OnSuccessListener<Void>()
+                                                {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid)
+                                                    {
+                                                        UIUtils.testToast(false, "Order posted");
+                                                        gotoBack();
+                                                    }
+                                                });
+
                               }
                           }
                       });

@@ -2,6 +2,7 @@ package com.example.editme.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.editme.EditMe;
@@ -10,6 +11,7 @@ import com.example.editme.databinding.ActivityHomeBinding;
 import com.example.editme.fragments.HomeFragment;
 import com.example.editme.fragments.OrderFragment;
 import com.example.editme.fragments.ProfileFragment;
+import com.example.editme.model.Notifications;
 import com.example.editme.utils.AndroidUtil;
 import com.example.editme.utils.Constants;
 import com.example.editme.utils.UIUtils;
@@ -28,6 +30,7 @@ public class HomeActivity
 {
 
 
+    public static final String SELECTED_NOTIFICATION = "SELECTED_NOTIFICATION";
     private static final int SELECT_IMAGE = 454;
     private ActivityHomeBinding mBinding;
     private HomeFragment mHomeFragment;
@@ -63,6 +66,13 @@ public class HomeActivity
     {
         try
         {
+         /*   if (EditMe.instance()
+                      .getMAuth()
+                      .getCurrentUser() == null)
+            {
+                return;
+            }
+            */
             if (getIntent().getExtras()
                            .containsKey(Constants.IMAGE_DOWNLOADED))
             {
@@ -72,11 +82,34 @@ public class HomeActivity
                 startActivity(Intent.createChooser(intent,
                                                    AndroidUtil.getString(R.string.select_picture)));
             }
+
+
+            else if (getIntent().getExtras()
+                                .containsKey(SELECTED_NOTIFICATION))
+            {
+                Notifications notification = getIntent().getParcelableExtra(SELECTED_NOTIFICATION);
+                gotoOrderDetailScreen(notification.getOrderId());
+            }
+
+            else if (getIntent().getExtras()
+                                .containsKey(Constants.ORDER_ID))
+            {
+                gotoOrderDetailScreen(getIntent().getExtras()
+                                                 .getString(Constants.ORDER_ID));
+            }
+
         }
         catch (NullPointerException e)
         {
         }
 
+    }
+
+    private void gotoOrderDetailScreen(String orderId)
+    {
+        Intent orderDetailIntent = new Intent(this, OrderDetailsActivity.class);
+        orderDetailIntent.putExtra(OrderDetailsActivity.ORDER_ID, orderId);
+        startActivity(orderDetailIntent);
     }
 
 

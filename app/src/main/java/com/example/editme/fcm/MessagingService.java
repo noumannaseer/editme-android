@@ -12,6 +12,10 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.editme.EditMe;
+import com.example.editme.R;
+import com.example.editme.activities.HomeActivity;
+import com.example.editme.model.Notifications;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -50,21 +54,20 @@ public class MessagingService
         // showNotification();
         RemoteMessage.Notification notification = remoteMessage.getNotification();
 
-        /*val userID = AtlSafe.instance()
-                            .getMUserID();
+        val userID = EditMe.instance()
+                           .getMUserId();
         Intent intent = new Intent(this, HomeActivity.class);
         intent.putExtra(HomeActivity.SELECTED_NOTIFICATION,
-                        new Notifications("", "", notification.getTitle(), notification.getBody(),
-                                          Integer.parseInt(remoteMessage.getData()
-                                                                        .get("notification_type")),
-                                          0, userID, userID));
+                        new Notifications(notification.getTitle(), notification.getBody(),
+                                          remoteMessage.getData()
+                                                       .get("orderId")));
         sendNotifaication2(this, notification.getTitle(), notification.getBody(),
-                           intent);*/
+                           intent);
 
     }
 
 
-    /*private void sendNotifaication2(Context context, String title, String body, Intent intent)
+    private void sendNotifaication2(Context context, String title, String body, Intent intent)
     {
 
         NotificationManager notificationManager = (NotificationManager)context.getSystemService(
@@ -95,10 +98,11 @@ public class MessagingService
         );
         mBuilder.setContentIntent(resultPendingIntent);
 
+        mBuilder.setAutoCancel(true);
         notificationManager.notify(notificationId, mBuilder.build());
     }
 
-
+/*
     private void sendNotification(RemoteMessage remoteMessage)
     {
         RemoteMessage.Notification notification = remoteMessage.getNotification();

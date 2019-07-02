@@ -4,11 +4,17 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
+import com.example.editme.EditMe;
 import com.example.editme.R;
 import com.example.editme.databinding.ActivityUpdatePasswordBinding;
 import com.example.editme.utils.AndroidUtil;
 import com.example.editme.utils.UIUtils;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
@@ -93,9 +99,53 @@ public class UpdatePasswordActivity
             return;
 
         }
+        if (newPassword.length() > 7 && oldPassword.length() > 7)
+        {
 
-        UIUtils.testToast(false, "Password updated");
-        finish();
+            val user = EditMe.instance()
+                             .getMAuth()
+                             .getCurrentUser();
+
+            AuthCredential credential = EmailAuthProvider
+                    .getCredential(user.getEmail(), oldPassword);
+
+            user.reauthenticate(credential)
+                .addOnCompleteListener(new OnCompleteListener<Void>()
+                {
+                    @Override
+                    public void onComplete(@lombok.NonNull Task<Void> task)
+                    {
+                        if (task.isSuccessful())
+                        {
+                            EditMe.instance()
+                                  .getMAuth()
+                                  .getCurrentUser()
+                                  .updatePassword(newPassword)
+                                  .addOnCompleteListener(
+                                          new OnCompleteListener<Void>()
+                                          {
+                                              @Override
+                                              public void onComplete(@NonNull Task<Void> task)
+                                              {
+                                                  AndroidUtil.toast(false, AndroidUtil.getString(
+                                                          R.string.password_updated));
+                                                  finish();
+                                              }
+                                          });
+                        }
+                        else
+                        {
+                            // Password is incorrect
+                            AndroidUtil.toast(false,
+                                              task.getException()
+                                                  .getLocalizedMessage());
+                            //    AndroidUtil.toast(false, getString(R.string.incorect_passeord));
+                        }
+                    }
+                });
+
+        }
+
     }
 
     //******************************************************************
