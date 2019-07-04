@@ -1,7 +1,10 @@
 package com.example.editme.activities;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,9 +19,12 @@ import com.example.editme.databinding.ActivityCheckoutBinding;
 import com.example.editme.model.EditImage;
 import com.example.editme.model.Order;
 import com.example.editme.model.OrderImages;
+import com.example.editme.services.retrofit_image_download_service.BackgroundNotificationService;
+import com.example.editme.services.upload_services.UploadImagesService;
 import com.example.editme.utils.AndroidUtil;
 import com.example.editme.utils.Constants;
 import com.example.editme.utils.UIUtils;
+import com.example.editme.worker.UploadImageWorker;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -39,7 +45,12 @@ import java.util.concurrent.TimeUnit;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 import lombok.NonNull;
 import lombok.val;
 
@@ -60,6 +71,7 @@ public class CheckOutActivity
     private List<OrderImages> mOrderImageList;
     private StorageReference mStorage;
     private Date mDueDate;
+    public static String PROGRESS_UPDATE = "PROGRESS_UPDATE";
 
     //******************************************************************
     @Override
@@ -83,6 +95,7 @@ public class CheckOutActivity
             showCalendar(mBinding.deliveryTime);
         });
 
+        registerReceiver();
         if (mEditImageList != null)
         {
             showDataOnRecyclerView();
@@ -131,6 +144,59 @@ public class CheckOutActivity
         });
         dialog.show();
     }
+
+    private void registerReceiver()
+    {
+
+        LocalBroadcastManager bManager = LocalBroadcastManager.getInstance(this);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(PROGRESS_UPDATE);
+        bManager.registerReceiver(mBroadcastReceiver, intentFilter);
+
+    }
+
+    //*********************************************************************
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver()
+            //*********************************************************************
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+
+            if (intent.getAction()
+                      .equals(PROGRESS_UPDATE))
+            {
+
+                boolean downloadComplete = intent.getBooleanExtra(Constants.DOWNLOAD_COMPLETE,
+                                                                  false);
+
+                int imageId = intent.getIntExtra(UploadImagesService.ORDER_IMAGES_ID, -1);
+                String imageUrl = intent.getStringExtra(UploadImagesService.IMAGE_URL);
+                if (mOrderImageList == null)
+                    mOrderImageList = new ArrayList<>();
+
+                if (downloadComplete)
+                {
+                    mOrderImageList.add(
+                            new OrderImages(
+                                    mEditImageList.get(
+                                            imageId)
+                                                  .getDescription(),
+                                    imageUrl
+                                    , ""));
+                    mEditImageList.get(imageId)
+                                  .setUploading(1);
+                    mAddImagesCustomAdapter.notifyItemChanged(
+                            imageId);
+
+                    if (mOrderImageList.size() == mEditImageList.size())
+                    {
+                        saveDataToFireStore("Aaldkksaksjal");
+                    }
+                }
+            }
+        }
+    };
 
     //**********************************************************************************
     private void getDaysBetweenDates(String start, String end)
@@ -205,11 +271,12 @@ public class CheckOutActivity
             StorageReference filePath = mStorage.child(Constants.ORDER_IMAGES)
                                                 .child(userId)
                                                 .child(orderId + "" + i);
+
             mEditImageList.get(i)
                           .setUploading(0);
             mAddImagesCustomAdapter.notifyItemChanged(i);
 
-
+/*
             int finalI = i;
             val imageIntentUri = mEditImageList.get(finalI)
                                                .getImageIntentURI();
@@ -260,9 +327,70 @@ public class CheckOutActivity
                                                 }
                                             }
                                         });
+            */
+
+            startImageDownload(i);
 
         }
 
+    }
+
+    //*************************************************************************************
+    private void startImageDownload(int index)
+    //*************************************************************************************
+    {
+
+     /*   val compressionWork = new OneTimeWorkRequest.Builder(UploadImageWorker.class);
+        val data = new Data.Builder();
+        data.putString(UploadImageWorker.ORDER_IMAGES_URI, mEditImageList.get(index)
+                                                                         .getImageIntentURI()
+                                                                         .toString());
+        compressionWork.setInputData(data.build());
+
+        WorkManager.getInstance()
+                   .enqueue(compressionWork.build());*/
+        OneTimeWorkRequest uploadWorkRequest = new OneTimeWorkRequest.Builder(
+                UploadImageWorker.class).setInputData(createInputDataForUri(index))
+                                        .build();
+        WorkManager.getInstance()
+                   .enqueue(uploadWorkRequest);
+
+      /*  WorkManager.getInstance()
+                   .beginWith()
+                   .getWorkInfosLiveData()
+                   .observe(this, workInfos -> {
+
+                   });*/
+
+
+        /*Intent intent = new Intent(this, UploadImagesService.class);
+        intent.putExtra(UploadImagesService.ORDER_IMAGES_ID, index);
+        intent.putExtra(UploadImagesService.ORDER_IMAGES_URI, mEditImageList.get(index)
+                                                                            .getImageIntentURI()
+                                                                            .toString());
+        startService(intent);*/
+    /*    WorkManager.getInstance()
+                   .getWorkInfoByIdLiveData(uploadWorkRequest.getId())
+                   .observe(lifecycleOwner, Observer {
+        workInfo ->
+        // Check if the current work's state is "successfully finished"
+        if (workInfo != null && workInfo.state == WorkInfo.State.SUCCEEDED)
+        {
+            displayImage(workInfo.outputData.getString(KEY_IMAGE_URI))
+        }
+    })*/
+
+    }
+
+    private Data createInputDataForUri(int index)
+    {
+        Data.Builder builder = new Data.Builder();
+        builder.putInt(UploadImageWorker.ORDER_IMAGES_ID, index);
+        builder.putString(UploadImageWorker.ORDER_IMAGES_URI, mEditImageList.get(index)
+                                                                            .getImageIntentURI()
+                                                                            .toString());
+
+        return builder.build();
     }
 
     //******************************************************************
@@ -303,6 +431,7 @@ public class CheckOutActivity
                                   packagesDetails.decrement(mEditImageList.size());
                                   val userId = EditMe.instance()
                                                      .getMUserId();
+
                                   EditMe.instance()
                                         .getMFireStore()
                                         .collection(Constants.Users)

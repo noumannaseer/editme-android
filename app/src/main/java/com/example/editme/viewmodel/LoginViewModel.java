@@ -47,7 +47,6 @@ public class LoginViewModel
         mListener = listener;
     }
 
-
     //*********************************************************************************************************************
     public void onLoginClick(View view)
     //*********************************************************************************************************************
@@ -58,20 +57,16 @@ public class LoginViewModel
             mLoginDialogBinding.loginEmail.setError(AndroidUtil.getString(R.string.required));
             return;
         }
-
         if (!UIUtils.isValidEmailId(email.getValue()))
         {
             mLoginDialogBinding.loginEmail.setError(AndroidUtil.getString(R.string.email_format));
             return;
         }
-
         if (TextUtils.isEmpty(password.getValue()))
         {
             mLoginDialogBinding.password.setError(AndroidUtil.getString(R.string.required));
             return;
         }
-
-
         if (password.getValue()
                     .length() < 8)
         {
@@ -96,8 +91,6 @@ public class LoginViewModel
                                  .getCurrentUser()
                                  .isEmailVerified())
                       {
-
-
                           EditMe.instance()
                                 .getMAuth()
                                 .getCurrentUser()

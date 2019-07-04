@@ -87,5 +87,8 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:1.1.0"
     implementation "android.arch.lifecycle:viewmodel:1.1.0"
 
+//    implementation "android.arch.work:work-runtime:1.0.0-alpha08"
+    implementation "androidx.work:work-runtime:2.0.1"
+
     // Google play services for location information
 }

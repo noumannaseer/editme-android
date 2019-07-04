@@ -124,7 +124,6 @@ public class HomeFragment
                       mOrderList = new ArrayList<>();
                       for (val child : queryDocumentSnapshots.getDocuments())
                       {
-
                           val order = child.toObject(Order.class);
                           if (!order.getStatus()
                                     .equals(Constants.STATUS_COMPLETE))

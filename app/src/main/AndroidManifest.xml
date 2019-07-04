@@ -124,6 +124,8 @@
             android:value="true" />
 
         <service android:name=".services.retrofit_image_download_service.BackgroundNotificationService" />
+        <service android:name=".services.upload_services.UploadImagesService" android:stopWithTask="true" />
+
         <service
             android:name=".fcm.MessagingService"
             tools:ignore="ExportedService">
