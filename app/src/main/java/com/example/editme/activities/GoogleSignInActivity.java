@@ -21,6 +21,10 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import androidx.appcompat.app.AppCompatActivity;
 import lombok.NonNull;
@@ -136,6 +140,7 @@ public class GoogleSignInActivity
                                        user.getUid(),
                                        user.getPhotoUrl()
                                            .toString());
+
                       }
                       else
                       {
@@ -169,7 +174,28 @@ public class GoogleSignInActivity
                               EditMe.instance()
                                     .loadUserDetail();
 
-                              GoogleSignInActivity.super.onBackPressed();
+
+                              String instanceId = FirebaseInstanceId.getInstance()
+                                                                    .getToken();
+                              Map<String, Object> fcmToken = new HashMap<>();
+                              fcmToken.put(Constants.FCM_TOKEN, instanceId);
+                              EditMe.instance()
+                                    .loadUserDetail();
+                              EditMe.instance()
+                                    .getMFireStore()
+                                    .collection(Constants.Users)
+                                    .document(EditMe.instance()
+                                                    .getMUserId())
+                                    .update(fcmToken)
+                                    .addOnCompleteListener(
+                                            new OnCompleteListener<Void>()
+                                            {
+                                                @Override
+                                                public void onComplete(@androidx.annotation.NonNull Task<Void> task)
+                                                {
+                                                    GoogleSignInActivity.super.onBackPressed();
+                                                }
+                                            });
 
                           }
                       });

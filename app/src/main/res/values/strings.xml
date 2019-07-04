@@ -148,6 +148,9 @@
     <string name="incorrect_password">Incorrect password</string>
     <string name="password_updated">password updated</string>
     <string name="package_buy_successfully">Package  buy successfully</string>
-
+    <string name="image_is_uploading">You Image is uploading</string>
+    <string name="image">Image</string>
+    <string name="uploaded_format">Uploaded: %1$d %%</string>
+    <string name="image_upload_complete">Image %1$d Upload complete</string>
 
 </resources>

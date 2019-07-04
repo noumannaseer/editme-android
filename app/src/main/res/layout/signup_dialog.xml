@@ -106,15 +106,15 @@
                 </LinearLayout>
 
                 <Button
-                    android:onClick="@{(view)->signup.onSignUpClick(view)}"
-
                     android:id="@+id/btn_signup"
+
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:layout_alignParentBottom="true"
                     android:layout_gravity="center"
                     android:layout_marginTop="20sp"
                     android:background="@drawable/buttonshape"
+                    android:onClick="@{(view)->signup.onSignUpClick(view)}"
                     android:text="@string/signup"
                     android:textColor="@android:color/white" />
 
@@ -127,7 +127,7 @@
 
                     >
 
-                    <de.hdodenhof.circleimageview.CircleImageView android:id="@+id/btn_facebook"
+                    <com.example.editme.widget.CircularImageView android:id="@+id/btn_facebook"
                         xmlns:app="http://schemas.android.com/apk/res-auto"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
@@ -148,7 +148,7 @@
                         android:text="FaceBook Login"
                         android:visibility="gone" />
 
-                    <de.hdodenhof.circleimageview.CircleImageView android:id="@+id/btn_googleplus"
+                    <com.example.editme.widget.CircularImageView android:id="@+id/btn_googleplus"
                         xmlns:app="http://schemas.android.com/apk/res-auto"
                         android:layout_width="50dp"
                         android:layout_height="50dp"

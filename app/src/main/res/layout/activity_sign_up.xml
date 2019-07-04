@@ -138,7 +138,7 @@
 
                 >
 
-                <de.hdodenhof.circleimageview.CircleImageView android:id="@+id/btn_facebook"
+                <com.example.editme.widget.CircularImageView android:id="@+id/btn_facebook"
                     xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="65dp"
                     android:layout_height="65dp"
@@ -149,7 +149,7 @@
                     android:src="@drawable/facebook" />
 
 
-                <de.hdodenhof.circleimageview.CircleImageView android:id="@+id/btn_googleplus"
+                <com.example.editme.widget.CircularImageView android:id="@+id/btn_googleplus"
                     xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="65dp"
                     android:layout_height="65dp"

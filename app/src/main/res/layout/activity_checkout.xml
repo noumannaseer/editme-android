@@ -197,7 +197,6 @@
                 </androidx.cardview.widget.CardView>
 
                 <Button
-
                     android:id="@+id/place_order"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

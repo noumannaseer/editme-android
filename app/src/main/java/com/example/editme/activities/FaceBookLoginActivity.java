@@ -2,9 +2,11 @@ package com.example.editme.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import com.example.editme.EditMe;
 import com.example.editme.R;
+import com.example.editme.databinding.ActivityFaceBookLoginBinding;
 import com.example.editme.model.User;
 import com.example.editme.utils.AndroidUtil;
 import com.example.editme.utils.Constants;
@@ -23,11 +25,15 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 
 
 //*******************************************************************
@@ -37,6 +43,7 @@ public class FaceBookLoginActivity
 {
 
     private CallbackManager callbackManager;
+    private ActivityFaceBookLoginBinding mBinding;
 
     //*******************************************************************
     @Override
@@ -44,7 +51,7 @@ public class FaceBookLoginActivity
     //*******************************************************************
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_face_book_login);
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_face_book_login);
         initControls();
     }
 
@@ -79,6 +86,7 @@ public class FaceBookLoginActivity
                                     UIUtils.testToast(false, AndroidUtil.getString(
                                             R.string.fb_login_successs));
                                     handleFaceBookToken(loginResult.getAccessToken());
+
                                 }
 
                                 @Override
@@ -103,6 +111,8 @@ public class FaceBookLoginActivity
     private void handleFaceBookToken(AccessToken accessToken)
     //*********************************************************************
     {
+
+        mBinding.progressView.setVisibility(View.VISIBLE);
         AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());
         EditMe.instance()
               .getMAuth()
@@ -172,7 +182,35 @@ public class FaceBookLoginActivity
                           {
                               EditMe.instance()
                                     .loadUserDetail();
+                              updateFCMToken();
+                          }
+                      });
+    }
+
+    private void updateFCMToken()
+    {
+        String instanceId = FirebaseInstanceId.getInstance()
+                                              .getToken();
+        Map<String, Object> fcmToken = new HashMap<>();
+        fcmToken.put(Constants.FCM_TOKEN, instanceId);
+        EditMe.instance()
+              .loadUserDetail();
+        EditMe.instance()
+              .getMFireStore()
+              .collection(Constants.Users)
+              .document(EditMe.instance()
+                              .getMUserId())
+              .update(fcmToken)
+              .addOnCompleteListener(
+                      new OnCompleteListener<Void>()
+                      {
+                          @Override
+                          public void onComplete(@androidx.annotation.NonNull Task<Void> task)
+                          {
+
+                              mBinding.progressView.setVisibility(View.GONE);
                               FaceBookLoginActivity.super.onBackPressed();
+
                           }
                       });
     }
