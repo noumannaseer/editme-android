@@ -69,7 +69,12 @@ public class CheckOutActivity
     private List<OrderImages> mOrderImageList;
     private StorageReference mStorage;
     private Date mDueDate;
+    private String mDueDateString;
+
     public static String PROGRESS_UPDATE = "PROGRESS_UPDATE";
+    public static String DUE_DATE = "DUE_DATE";
+    public static String DUE_DATE_STRING = "DUE_DATE_STRING";
+
 
     //******************************************************************
     @Override
@@ -90,7 +95,7 @@ public class CheckOutActivity
         getParcelable();
         setTab();
         mBinding.placeOrder.setOnClickListener(view -> uploadImages());
-        mBinding.deliveryTimeLayout.setOnClickListener(view -> showCalendar(mBinding.deliveryTime));
+//        mBinding.deliveryTimeLayout.setOnClickListener(view -> showCalendar(mBinding.deliveryTime));
 
         if (mEditImageList != null)
         {
@@ -372,7 +377,11 @@ public class CheckOutActivity
                                            .getString(ORDER_DESCRIPTION);
             mEditImageList = getIntent().getExtras()
                                         .getParcelableArrayList(IMAGES_LIST);
+
+            mDueDate = getIntent().getParcelableExtra(DUE_DATE);
             mBinding.totalImages.setText("" + mEditImageList.size());
+            mBinding.deliveryTime.setText(getIntent().getExtras()
+                                                     .getString(DUE_DATE_STRING));
         }
 
     }

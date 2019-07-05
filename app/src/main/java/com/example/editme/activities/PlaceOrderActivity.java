@@ -15,6 +15,9 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CalendarView;
+import android.widget.TextView;
 
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.features.ReturnMode;
@@ -36,7 +39,13 @@ import com.google.firebase.firestore.SetOptions;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -65,10 +74,11 @@ public class PlaceOrderActivity
     public static final String SELECTED_INDEX = "SELECTED_INDEX";
     private Order mOrder;
     private boolean mIsUpdate = false;
-
     public static String SHARED_SINGLE_IMAGE_URI = "SHARED_SINGLE_IMAGE_URI";
     public static String SHARED_MULTIPLE_IMAGE_URI = "SHARED_MULTIPLE_IMAGE_URI";
 
+    private Date mDueDate;
+    private String mDueDateString;
 
     //******************************************************************
     @Override
@@ -101,6 +111,8 @@ public class PlaceOrderActivity
         getParcelable();
         mBinding.addImage.setOnClickListener(view -> showImageDialog());
         mBinding.orderDescription.clearFocus();
+        if (!mIsUpdate)
+            mBinding.deliverDate.setOnClickListener(view -> showCalendar(mBinding.deliverDate));
         if (mOrder != null && mEditImages == null)
         {
             mBinding.toolbarNext.setText(AndroidUtil.getString(R.string.update));
@@ -117,6 +129,88 @@ public class PlaceOrderActivity
                 updateOrder();
         });
 
+    }
+
+    //*****************************************************************
+    public void showCalendar(@lombok.NonNull TextView textView)
+    //*****************************************************************
+    {
+
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.calender_dialog);
+        CalendarView calender = dialog.findViewById(R.id.calendarView1);
+        Button select = dialog.findViewById(R.id.select_date);
+        Button cancel = dialog.findViewById(R.id.cancel);
+
+        select.setOnClickListener(view -> dialog.dismiss());
+
+        cancel.setOnClickListener(view -> dialog.dismiss());
+
+        calender.setOnDateChangeListener(new CalendarView.OnDateChangeListener()
+        {
+            @Override
+            public void onSelectedDayChange(CalendarView view, int year, int month,
+                                            int dayOfMonth)
+            {
+
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(year, month, dayOfMonth);
+                mDueDate = calendar.getTime();
+                String startDate = new SimpleDateFormat("dd/MM/yyyy").format(Calendar.getInstance()
+                                                                                     .getTime());
+                val endDate = dayOfMonth + "/" + (month + 1) + "/" + year;
+                getDaysBetweenDates(startDate, endDate);
+
+            }
+        });
+        dialog.show();
+    }
+
+    //**********************************************************************************
+    private void getDaysBetweenDates(String start, String end)
+    //**********************************************************************************
+    {
+        if (start.equals(
+                AndroidUtil.getString(R.string.standard_date_format)) || end.equals(
+                AndroidUtil.getString(R.string.standard_date_format)))
+        {
+            //  AndroidUtil.toast(false, "Please select valid order of date");
+            return;
+        }
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+        Date startDate, endDate;
+        long numberOfDays = 0;
+        try
+        {
+            startDate = dateFormat.parse(start);
+            endDate = dateFormat.parse(end);
+            numberOfDays = getUnitBetweenDates(startDate, endDate, TimeUnit.DAYS);
+        }
+        catch (ParseException e)
+        {
+            e.printStackTrace();
+        }
+        if (numberOfDays >= 1)
+        {
+
+            mDueDateString = AndroidUtil.getString(R.string.due_date, numberOfDays);
+            mBinding.deliverDate.setText(AndroidUtil.getString(R.string.days4, numberOfDays));
+            mBinding.deliverDate.setError(null);
+        }
+        else
+        {
+            mBinding.deliverDate.setText(AndroidUtil.getString(R.string.standard_date_format));
+        }
+
+    }
+
+    //**********************************************************************************
+    private static long getUnitBetweenDates(Date startDate, Date endDate, TimeUnit unit)
+    //**********************************************************************************
+    {
+        long timeDiff =
+                endDate.getTime() - startDate.getTime();
+        return unit.convert(timeDiff, TimeUnit.MILLISECONDS);
     }
 
     //******************************************************************
@@ -277,6 +371,8 @@ public class PlaceOrderActivity
     {
         val description = mBinding.orderDescription.getText()
                                                    .toString();
+        val totalDays = mBinding.deliverDate.getText()
+                                            .toString();
         if (mEditImages.size() == 0)
         {
             UIUtils.showSnackBar(this, AndroidUtil.getString(R.string.please_add_image));
@@ -288,11 +384,19 @@ public class PlaceOrderActivity
             mBinding.orderDescription.requestFocus();
             return;
         }
-
+        if (totalDays.equals(AndroidUtil.getString(R.string.standard_date_format)))
+        {
+            mBinding.deliverDate.setError(AndroidUtil.getString(R.string.required));
+            mBinding.deliverDate.requestFocus();
+            return;
+        }
 
         Intent checkOutIntent = new Intent(this, CheckOutActivity.class);
         checkOutIntent.putParcelableArrayListExtra(CheckOutActivity.IMAGES_LIST, mEditImages);
         checkOutIntent.putExtra(CheckOutActivity.ORDER_DESCRIPTION, description);
+        checkOutIntent.putExtra(CheckOutActivity.DUE_DATE, mDueDate);
+        checkOutIntent.putExtra(CheckOutActivity.DUE_DATE_STRING, mDueDateString);
+
         startActivityForResult(checkOutIntent, 111);
 
     }
