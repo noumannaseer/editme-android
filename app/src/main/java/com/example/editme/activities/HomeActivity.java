@@ -1,7 +1,9 @@
 package com.example.editme.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 
@@ -17,11 +19,16 @@ import com.example.editme.utils.Constants;
 import com.example.editme.utils.UIUtils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import lombok.Getter;
+import retrofit2.http.GET;
 
 //****************************************************************
 public class HomeActivity
@@ -36,6 +43,10 @@ public class HomeActivity
     private HomeFragment mHomeFragment;
     private OrderFragment mOrderFragment;
     private ProfileFragment mProfileFragment;
+    @Getter
+    private Uri mSingleImageUri;
+    @Getter
+    private List<Uri> mMultipleImageUri;
 
     //****************************************************************
     @Override
@@ -54,10 +65,46 @@ public class HomeActivity
         mHomeFragment = new HomeFragment();
         mOrderFragment = new OrderFragment();
         mProfileFragment = new ProfileFragment();
+
+        receiveImageFromGallery();
         loadFragment(mOrderFragment);
         mBinding.bottomNavigation.setOnNavigationItemSelectedListener(
                 mOnNavigationItemSelectedListener);
         getNotificationData();
+    }
+
+    private void receiveImageFromGallery()
+    {
+        Intent receivedIntent = getIntent();
+        String receivedAction = receivedIntent.getAction();
+        if (TextUtils.isEmpty(receivedAction))
+            return;
+        String receivedType = receivedIntent.getType();
+
+        Log.d(UIUtils.getTagName(this), receivedIntent.toString());
+        if (receivedAction.equals(Intent.ACTION_SEND))
+        {
+            if (receivedType.startsWith("image/"))
+                handleSendImage(receivedIntent);
+        }
+        else if (receivedAction.equals(Intent.ACTION_SEND_MULTIPLE))
+        {
+            if (receivedType.startsWith("image/"))
+                handleSendMultipleImages(receivedIntent);
+        }
+        else if (receivedAction.equals(Intent.ACTION_MAIN))
+        {
+        }
+    }
+
+    private void handleSendImage(Intent intent)
+    {
+        mSingleImageUri = (Uri)intent.getParcelableExtra(Intent.EXTRA_STREAM);
+    }
+
+    private void handleSendMultipleImages(Intent intent)
+    {
+        mMultipleImageUri = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
     }
 
     //*********************************************************************

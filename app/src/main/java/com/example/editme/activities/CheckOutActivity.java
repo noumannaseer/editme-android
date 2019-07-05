@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
@@ -40,6 +41,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -86,6 +88,7 @@ public class CheckOutActivity
     //******************************************************************
     {
         getParcelable();
+        setTab();
         mBinding.placeOrder.setOnClickListener(view -> uploadImages());
         mBinding.deliveryTimeLayout.setOnClickListener(view -> showCalendar(mBinding.deliveryTime));
 
@@ -98,6 +101,16 @@ public class CheckOutActivity
                                                          .getRemainingImages() - mEditImageList.size()));
             mBinding.description.setText("" + mOrderDescription);
         }
+    }
+
+    //******************************************************************
+    private void setTab()
+    //******************************************************************
+    {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     //*****************************************************************
@@ -391,6 +404,17 @@ public class CheckOutActivity
         finish();
     }
 
+    //******************************************************************
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    //******************************************************************
+    {
+        if (item.getItemId() == android.R.id.home)
+        {
+            onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     //******************************************************************
     @Override

@@ -98,8 +98,8 @@ public class UploadImageWorker
 
         mNotificationBuilder = new NotificationCompat.Builder(AndroidUtil.getApplicationContext(),
                                                               "id")
-                .setSmallIcon(android.R.drawable.stat_sys_download)
-                .setContentTitle(AndroidUtil.getString(R.string.image) + mImageId)
+                .setSmallIcon(android.R.drawable.stat_sys_upload)
+                .setContentTitle(AndroidUtil.getString(R.string.image) + (mImageId + 1))
                 .setContentText(AndroidUtil.getString(R.string.image_is_uploading))
                 .setDefaults(0)
                 .setContentIntent(resultPendingIntent)
@@ -177,8 +177,8 @@ public class UploadImageWorker
 
                                                 Log.d("image_url", task.getResult()
                                                                        .toString());
-                                                onDownloadComplete(true, task.getResult()
-                                                                             .toString());
+                                                onUploadComplete(true, task.getResult()
+                                                                           .toString());
                                                 val outputData = createOutputData(task.getResult()
                                                                                       .toString(),
                                                                                   mImageId);
@@ -223,20 +223,21 @@ public class UploadImageWorker
 
         Intent intent = new Intent(CheckOutActivity.PROGRESS_UPDATE);
         intent.putExtra(AndroidUtil.getString(
-                R.string.image_upload_complete, mImageId),
+                R.string.image_upload_complete, (mImageId + 1)),
                         downloadComplete);
         intent.putExtra(ORDER_IMAGES_ID, mImageId);
         intent.putExtra(IMAGE_URL, imageUrl);
     }
 
     //**************************************************************************************
-    private void onDownloadComplete(boolean downloadComplete, String imageUrl)
+    private void onUploadComplete(boolean downloadComplete, String imageUrl)
     //**************************************************************************************
     {
         sendProgressUpdate(downloadComplete, imageUrl);
         mNotificationManager.cancel(0);
         mNotificationBuilder.setProgress(0, 0, false);
-        mNotificationBuilder.setContentText("Image Upload Complete");
+        mNotificationBuilder.setContentText(AndroidUtil.getString(R.string.image_uploaded));
+        mNotificationBuilder.setSmallIcon(android.R.drawable.stat_sys_upload_done);
         mNotificationManager.notify(mImageId, mNotificationBuilder.build());
 
     }

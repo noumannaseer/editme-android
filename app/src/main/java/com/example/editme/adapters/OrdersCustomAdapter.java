@@ -78,7 +78,7 @@ public class OrdersCustomAdapter
     {
         final val item = mOrderList
                 .get(position);
-        holder.mBinding.totalImages.setText(AndroidUtil.getString(R.string.photo_count_template,
+        holder.mBinding.totalImages.setText(AndroidUtil.getString(R.plurals.photo_count_template,
                                                                   item.getImages()
                                                                       .size()));
         holder.mBinding.orderDescription.setText(item.getDescription());

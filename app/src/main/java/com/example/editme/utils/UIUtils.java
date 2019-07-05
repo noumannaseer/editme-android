@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.editme.R;
+import com.example.editme.activities.HomeActivity;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserInfo;
@@ -318,7 +319,7 @@ public class UIUtils
 
 
     //******************************************************************
-    public static void displayAlertDialog(String message, String title, Context context, DialogInterface.OnClickListener listerner, String positive)
+    public static void displayAlertDialog(String message, String title, Context context, String positive, DialogInterface.OnClickListener listerner)
     //******************************************************************
     {
 
@@ -332,7 +333,7 @@ public class UIUtils
     }
 
     //******************************************************************
-    public static void displayAlertDialog(String message, String title, Context context, DialogInterface.OnClickListener listerner, String positive, String negative)
+    public static void displayAlertDialog(String message, String title, Context context, String positive, String negative, DialogInterface.OnClickListener listerner)
     //******************************************************************
     {
 
@@ -536,6 +537,12 @@ public class UIUtils
                 .show();
     }
 
+    public static String getTagName(Context context)
+    {
+        return context.getClass()
+                      .getSimpleName();
+    }
+
     public interface CheckBoxSingleItemListener
     {
         void onItemSelected(int itemIndex);
@@ -707,7 +714,8 @@ public class UIUtils
             return 1;
      /*   else if (user.getProviderId()
                      .equals("firebase"))
-     */       return 2;
+     */
+        return 2;
 
     }
 }

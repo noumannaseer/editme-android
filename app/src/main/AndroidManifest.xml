@@ -14,7 +14,9 @@
         android:roundIcon="@mipmap/editme_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.CurrentPackageActivity"></activity>
+        <activity
+            android:name=".activities.CurrentPackageActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".activities.ImageSliderActivity"
             android:screenOrientation="portrait"
@@ -59,6 +61,22 @@
         <activity
             android:name=".activities.HomeActivity"
             android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+
             <intent-filter>
                 <action android:name="MATRIMONY" />
 
@@ -124,7 +142,9 @@
             android:value="true" />
 
         <service android:name=".services.retrofit_image_download_service.BackgroundNotificationService" />
-        <service android:name=".services.upload_services.UploadImagesService" android:stopWithTask="true" />
+        <service
+            android:name=".services.upload_services.UploadImagesService"
+            android:stopWithTask="true" />
 
         <service
             android:name=".fcm.MessagingService"

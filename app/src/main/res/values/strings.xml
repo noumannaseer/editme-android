@@ -46,7 +46,7 @@
     <string name="status">Status : </string>
     <string name="order_details">Order details</string>
     <string name="place_order">Place order</string>
-    <string name="edit_image_message">EVERYTHING YOU NEED FOR PHOTO EDITING, WITHOUT THE COMPLEX DESIGN SOFTWARE INSTALLATION</string>
+    <string name="edit_image_message">Everything you need for photo editing, without the complex design software installation</string>
     <string name="place_your_order_now">Place your order now</string>
     <string name="profile">Profile</string>
     <string name="my_order_history">Order history</string>
@@ -128,7 +128,14 @@
     <string name="fb_login_successs">FaceBook Login Successfully</string>
     <string name="fb_login_cancel">FaceBook Login Cancel</string>
     <string name="google_signin_failed">Google sign in failed</string>
-    <string name="photo_count_template">%1$d Photos</string>
+
+    <plurals name="photo_count_template">
+        <item quantity="one">%d Photo</item>
+        <item quantity="other">%d Photos</item>
+    </plurals>
+
+    <!--<string name="photo_count_template">%1$d Photos</string>
+    -->
     <string name="view_images">View images</string>
     <string name="completed">Completed</string>
     <string name="order_updated">Your order is updated</string>
@@ -148,9 +155,17 @@
     <string name="incorrect_password">Incorrect password</string>
     <string name="password_updated">password updated</string>
     <string name="package_buy_successfully">Package  buy successfully</string>
-    <string name="image_is_uploading">You Image is uploading</string>
+    <string name="image_is_uploading">Your image is uploading</string>
     <string name="image">Image</string>
-    <string name="uploaded_format">Uploaded: %1$d %%</string>
-    <string name="image_upload_complete">Image %1$d Upload complete</string>
+    <string name="uploaded_format">Uploaded:&#160;%1$d %%</string>
+    <string name="image_upload_complete">Image&#160;%1$d upload complete</string>
+    <string name="image_uploaded">Image upload complete</string>
+    <string name="downloading_image">Downloading image</string>
+    <string name="dowload_progress_template">Downloaded:&#160;%1$d %%"</string>
+    <string name="image_download_complete">Image download complete</string>
+    <string name="order_description">Order description</string>
+    <string name="please_package">Please purchase package</string>
+    <string name="your_image_description_here">Your image description</string>
+    <string name="current_package">Current package</string>
 
 </resources>

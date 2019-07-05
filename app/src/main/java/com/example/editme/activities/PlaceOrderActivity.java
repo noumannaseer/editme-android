@@ -42,7 +42,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import lombok.val;
 
 import static com.example.editme.utils.AndroidUtil.getContext;
@@ -61,9 +63,11 @@ public class PlaceOrderActivity
     private AddImagesCustomAdapter mAddImagesCustomAdapter;
     public static final String SELECTED_ORDER = "SELECTED_ORDER";
     public static final String SELECTED_INDEX = "SELECTED_INDEX";
-
     private Order mOrder;
     private boolean mIsUpdate = false;
+
+    public static String SHARED_SINGLE_IMAGE_URI = "SHARED_SINGLE_IMAGE_URI";
+    public static String SHARED_MULTIPLE_IMAGE_URI = "SHARED_MULTIPLE_IMAGE_URI";
 
 
     //******************************************************************
@@ -92,13 +96,12 @@ public class PlaceOrderActivity
     private void initControls()
     //******************************************************************
     {
+        mEditImages = new ArrayList<>();
         setTab();
         getParcelable();
-
         mBinding.addImage.setOnClickListener(view -> showImageDialog());
-        mEditImages = new ArrayList<>();
         mBinding.orderDescription.clearFocus();
-        if (mOrder != null)
+        if (mOrder != null && mEditImages == null)
         {
             mBinding.toolbarNext.setText(AndroidUtil.getString(R.string.update));
             mBinding.toolbarNext.setVisibility(View.VISIBLE);
@@ -108,7 +111,7 @@ public class PlaceOrderActivity
             loadImagesOnRecyclerView();
         }
         mBinding.toolbarNext.setOnClickListener(view -> {
-            if (mOrder == null)
+            if (mOrder == null || !mIsUpdate)
                 gotoCheckOutScreen();
             else
                 updateOrder();
@@ -130,11 +133,38 @@ public class PlaceOrderActivity
     private void loadImagesOnRecyclerView()
     //******************************************************************
     {
+        attachSwipeToDeleteListener();
         OrderImagesListCustomAdapter orderImagesListCustomAdapter = new OrderImagesListCustomAdapter(
                 mOrder.getImages(), PlaceOrderActivity.this);
         mBinding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         mBinding.recyclerView.setAdapter(orderImagesListCustomAdapter);
 
+    }
+
+
+    //*********************************************************
+    private void attachSwipeToDeleteListener()
+    //*********************************************************
+    {
+        new ItemTouchHelper(
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT)
+                {
+                    @Override
+                    public boolean onMove(@lombok.NonNull RecyclerView recyclerView, @lombok.NonNull RecyclerView.ViewHolder viewHolder, @lombok.NonNull RecyclerView.ViewHolder target)
+                    {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(@lombok.NonNull RecyclerView.ViewHolder viewHolder, int direction)
+                    {
+                        val index = viewHolder.getAdapterPosition();
+                        mEditImages.remove(index);
+                        if (mEditImages.size() == 0)
+                            mBinding.toolbarNext.setVisibility(View.GONE);
+                        mAddImagesCustomAdapter.notifyDataSetChanged();
+                    }
+                }).attachToRecyclerView(mBinding.recyclerView);
     }
 
     //******************************************************************
@@ -169,7 +199,8 @@ public class PlaceOrderActivity
                                   UIUtils.displayAlertDialog(
                                           AndroidUtil.getString(R.string.order_updated),
                                           AndroidUtil.getString(R.string.update),
-                                          PlaceOrderActivity.this,
+                                          PlaceOrderActivity.this
+                                          , AndroidUtil.getString(R.string.ok),
                                           new DialogInterface.OnClickListener()
                                           {
                                               @Override
@@ -184,7 +215,7 @@ public class PlaceOrderActivity
                                                   }
 
                                               }
-                                          }, AndroidUtil.getString(R.string.ok));
+                                          });
                               }
 
                           }
@@ -205,6 +236,33 @@ public class PlaceOrderActivity
                                     .getParcelable(SELECTED_ORDER);
                 mIsUpdate = true;
             }
+            else if (getIntent().getExtras()
+                                .containsKey(SHARED_SINGLE_IMAGE_URI))
+            {
+                mOrder = new Order();
+                Uri singleImageUri = getIntent().getExtras()
+                                                .getParcelable(SHARED_SINGLE_IMAGE_URI);
+                mEditImages = new ArrayList<>();
+                mEditImages.add(
+                        new EditImage(AndroidUtil.getString(R.string.your_image_description_here),
+                                      singleImageUri, -1));
+                showDataOnRecyclerView();
+            }
+
+            else if (getIntent().getExtras()
+                                .containsKey(SHARED_MULTIPLE_IMAGE_URI))
+            {
+                mOrder = new Order();
+                ArrayList<Uri> multipleImageUri = getIntent().getExtras()
+                                                             .getParcelableArrayList(
+                                                                     SHARED_MULTIPLE_IMAGE_URI);
+                mEditImages = new ArrayList<>();
+                for (val uri : multipleImageUri)
+                    mEditImages.add(new EditImage(
+                            AndroidUtil.getString(R.string.your_image_description_here), uri, -1));
+                showDataOnRecyclerView();
+            }
+
         }
         catch (Exception e)
         {
@@ -227,6 +285,7 @@ public class PlaceOrderActivity
         if (TextUtils.isEmpty(description))
         {
             mBinding.orderDescription.setError(AndroidUtil.getString(R.string.required));
+            mBinding.orderDescription.requestFocus();
             return;
         }
 
@@ -402,16 +461,36 @@ public class PlaceOrderActivity
     }
 
 
+    //*********************************************************
+    @Override
+    public void onBackPressed()
+    //*********************************************************
+    {
+
+        UIUtils.displayAlertDialog("Order is not complete .Are you really want to exit?",
+                                   "Exit",
+                                   this, AndroidUtil.getString(R.string.yes),
+                                   AndroidUtil.getString(R.string.no),
+                                   new DialogInterface.OnClickListener()
+                                   {
+                                       @Override
+                                       public void onClick(DialogInterface dialog, int which)
+                                       {
+                                           if (which == -1)
+                                               PlaceOrderActivity.super.onBackPressed();
+                                       }
+                                   });
+    }
+
     //******************************************************************
     private void showDataOnRecyclerView()
     //******************************************************************
     {
         if (mEditImages.size() > 0)
             mBinding.toolbarNext.setVisibility(View.VISIBLE);
-
-
+        attachSwipeToDeleteListener();
         mAddImagesCustomAdapter = new AddImagesCustomAdapter(mEditImages,
-                                                             this, true, this, false);
+                                                             this, false, this, false);
         mBinding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         mBinding.recyclerView.setAdapter(mAddImagesCustomAdapter);
 
@@ -463,7 +542,7 @@ public class PlaceOrderActivity
     {
         if (item.getItemId() == android.R.id.home)
         {
-            super.onBackPressed();
+            onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }

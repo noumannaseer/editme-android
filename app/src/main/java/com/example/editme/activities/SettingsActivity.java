@@ -159,6 +159,8 @@ public class SettingsActivity
         mBinding.logoutLayout.setOnClickListener(view -> {
 
             UIUtils.displayAlertDialog(AndroidUtil.getString(R.string.logout_dialog), null, this,
+                                       AndroidUtil.getString(R.string.yes),
+                                       AndroidUtil.getString(R.string.no),
                                        new DialogInterface.OnClickListener()
                                        {
                                            @Override
@@ -166,7 +168,8 @@ public class SettingsActivity
                                            {
                                                if (which == -1)
                                                {
-                                                   UIUtils.setPackageStatus(false);
+                                                   UIUtils.setPackageStatus(
+                                                           false);
                                                    EditMe.instance()
                                                          .getMAuth()
                                                          .signOut();
@@ -177,8 +180,7 @@ public class SettingsActivity
 //                                                   SettingsActivity.super.onBackPressed();
                                                }
                                            }
-                                       }, AndroidUtil.getString(R.string.yes),
-                                       AndroidUtil.getString(R.string.no));
+                                       });
 
         });
 
