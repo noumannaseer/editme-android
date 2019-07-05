@@ -2,6 +2,7 @@ package com.example.editme;
 
 import android.app.Application;
 
+import com.example.editme.activities.HomeActivity;
 import com.example.editme.model.User;
 import com.example.editme.utils.AndroidUtil;
 import com.example.editme.utils.Constants;

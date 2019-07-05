@@ -170,7 +170,6 @@ public class OrderFragment
         mLoginDialog.show();
 
 
-
         if (loginViewModel == null)
         {
             loginViewModel = ViewModelProviders.of(

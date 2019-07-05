@@ -1,8 +1,10 @@
 package com.example.editme.activities;
 
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -16,16 +18,16 @@ import com.example.editme.databinding.ActivityCheckoutBinding;
 import com.example.editme.model.EditImage;
 import com.example.editme.model.Order;
 import com.example.editme.model.OrderImages;
+import com.example.editme.services.upload_services.UploadImagesService;
 import com.example.editme.utils.AndroidUtil;
 import com.example.editme.utils.Constants;
 import com.example.editme.utils.UIUtils;
-import com.google.android.gms.tasks.Continuation;
+import com.example.editme.worker.UploadImageWorker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,7 +41,12 @@ import java.util.concurrent.TimeUnit;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 import lombok.NonNull;
 import lombok.val;
 
@@ -60,6 +67,7 @@ public class CheckOutActivity
     private List<OrderImages> mOrderImageList;
     private StorageReference mStorage;
     private Date mDueDate;
+    public static String PROGRESS_UPDATE = "PROGRESS_UPDATE";
 
     //******************************************************************
     @Override
@@ -79,9 +87,7 @@ public class CheckOutActivity
     {
         getParcelable();
         mBinding.placeOrder.setOnClickListener(view -> uploadImages());
-        mBinding.deliveryTimeLayout.setOnClickListener(view -> {
-            showCalendar(mBinding.deliveryTime);
-        });
+        mBinding.deliveryTimeLayout.setOnClickListener(view -> showCalendar(mBinding.deliveryTime));
 
         if (mEditImageList != null)
         {
@@ -122,15 +128,14 @@ public class CheckOutActivity
 
                 String startDate = new SimpleDateFormat("dd/MM/yyyy").format(Calendar.getInstance()
                                                                                      .getTime());
-//                val startDate = currentDate.getDay() + "/" + currentDate.getMonth() + "/" + currentDate.getYear();
                 val endDate = dayOfMonth + "/" + (month + 1) + "/" + year;
                 getDaysBetweenDates(startDate, endDate);
 
-                // int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
             }
         });
         dialog.show();
     }
+
 
     //**********************************************************************************
     private void getDaysBetweenDates(String start, String end)
@@ -182,6 +187,8 @@ public class CheckOutActivity
     }
 
 
+    List<OneTimeWorkRequest> mOneTimeWorkRequestsList;
+
     //******************************************************************
     private void uploadImages()
     //******************************************************************
@@ -199,70 +206,85 @@ public class CheckOutActivity
         mOrderImageList = new ArrayList<>();
         val orderId = UUID.randomUUID()
                           .toString();
+
+        mOneTimeWorkRequestsList = new ArrayList<>();
         for (int i = 0; i < mEditImageList.size(); i++)
         {
-
-            StorageReference filePath = mStorage.child(Constants.ORDER_IMAGES)
-                                                .child(userId)
-                                                .child(orderId + "" + i);
             mEditImageList.get(i)
                           .setUploading(0);
             mAddImagesCustomAdapter.notifyItemChanged(i);
-
-
-            int finalI = i;
-            val imageIntentUri = mEditImageList.get(finalI)
-                                               .getImageIntentURI();
-            Task<Uri> uriTask = filePath.putFile(imageIntentUri)
-                                        .continueWithTask(
-                                                new Continuation<UploadTask.TaskSnapshot, Task<Uri>>()
-                                                {
-                                                    @Override
-                                                    public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task)
-                                                            throws Exception
-                                                    {
-                                                        if (!task.isSuccessful())
-                                                        {
-                                                            AndroidUtil.toast(false,
-                                                                              task.getException()
-                                                                                  .toString());
-                                                            throw task.getException();
-                                                        }
-                                                        return filePath.getDownloadUrl();
-                                                    }
-                                                })
-                                        .addOnCompleteListener(new OnCompleteListener<Uri>()
-                                        {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Uri> task)
-                                            {
-                                                if (task.isSuccessful())
-                                                {
-
-                                                    Log.d("image_url", task.getResult()
-                                                                           .toString());
-                                                    mOrderImageList.add(
-                                                            new OrderImages(
-                                                                    mEditImageList.get(
-                                                                            finalI)
-                                                                                  .getDescription(),
-                                                                    task.getResult()
-                                                                        .toString(), ""));
-                                                    mEditImageList.get(finalI)
-                                                                  .setUploading(1);
-                                                    mAddImagesCustomAdapter.notifyItemChanged(
-                                                            finalI);
-
-                                                    if (mOrderImageList.size() == mEditImageList.size())
-                                                    {
-                                                        saveDataToFireStore(orderId);
-                                                    }
-                                                }
-                                            }
-                                        });
+            startImageDownload(i);
 
         }
 
+    }
+
+    //*************************************************************************************
+    private void startImageDownload(int index)
+    //*************************************************************************************
+    {
+
+
+        OneTimeWorkRequest uploadWorkRequest = new OneTimeWorkRequest.Builder(
+                UploadImageWorker.class).setInputData(createInputDataForUri(index))
+                                        .build();
+        mOneTimeWorkRequestsList.add(uploadWorkRequest);
+        WorkManager.getInstance()
+                   .enqueue(uploadWorkRequest);
+
+        WorkManager.getInstance()
+                   .getWorkInfoByIdLiveData(uploadWorkRequest.getId())
+                   .observe(this, workInfo -> {
+                       if (workInfo.getState() == WorkInfo.State.SUCCEEDED)
+                           try
+                           {
+
+
+                               val imageId = workInfo.getOutputData()
+                                                     .getInt(UploadImageWorker.ORDER_IMAGES_ID, -1);
+                               val imageUrl = workInfo.getOutputData()
+                                                      .getString(UploadImageWorker.IMAGE_URL);
+
+                               Log.d("worker_info", imageId + " " + workInfo.getOutputData()
+                                                                            .getString(
+                                                                                    UploadImageWorker.IMAGE_URL));
+                               mOrderImageList.add(
+                                       new OrderImages(
+                                               mEditImageList.get(
+                                                       imageId)
+                                                             .getDescription(),
+                                               imageUrl, ""));
+                               mEditImageList.get(imageId)
+                                             .setUploading(1);
+                               mAddImagesCustomAdapter.notifyItemChanged(
+                                       imageId);
+                               if (mEditImageList.size() == mOrderImageList.size())
+                               {
+
+                                   val orderID = UUID.randomUUID()
+                                                     .toString();
+                                   saveDataToFireStore(orderID);
+                               }
+
+                           }
+                           catch (Exception w)
+                           {
+
+                           }
+
+                   });
+    }
+
+    //***************************************************************************
+    private Data createInputDataForUri(int index)
+    //***************************************************************************
+    {
+        Data.Builder builder = new Data.Builder();
+        builder.putInt(UploadImageWorker.ORDER_IMAGES_ID, index);
+        builder.putString(UploadImageWorker.ORDER_IMAGES_URI, mEditImageList.get(index)
+                                                                            .getImageIntentURI()
+                                                                            .toString());
+        return builder.build();
     }
 
     //******************************************************************
@@ -303,6 +325,7 @@ public class CheckOutActivity
                                   packagesDetails.decrement(mEditImageList.size());
                                   val userId = EditMe.instance()
                                                      .getMUserId();
+
                                   EditMe.instance()
                                         .getMFireStore()
                                         .collection(Constants.Users)

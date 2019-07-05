@@ -13,11 +13,17 @@ import com.example.editme.EditMe;
 import com.example.editme.R;
 import com.example.editme.adapters.CircularImageSliderAdapter;
 import com.example.editme.databinding.ActivityPackagesBinding;
+import com.example.editme.fragments.OrderFragment;
 import com.example.editme.model.PackagesDetails;
+import com.example.editme.model.User;
 import com.example.editme.utils.AndroidUtil;
 import com.example.editme.utils.Constants;
 import com.example.editme.utils.PaymentsUtil;
 import com.example.editme.utils.UIUtils;
+import com.example.editme.viewmodel.LoginViewModel;
+import com.example.editme.viewmodel.PackagesViewModel;
+import com.example.editme.viewmodelfactory.LoginViewModelFactory;
+import com.example.editme.viewmodelfactory.PackagesViewModelFactory;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -29,7 +35,6 @@ import com.google.android.gms.wallet.PaymentDataRequest;
 import com.google.android.gms.wallet.PaymentsClient;
 import com.google.android.gms.wallet.Wallet;
 import com.google.android.gms.wallet.WalletConstants;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.json.JSONException;
@@ -44,6 +49,7 @@ import java.util.Optional;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProviders;
 import lombok.NonNull;
 import lombok.val;
 
@@ -62,6 +68,8 @@ public class PackagesActivity
     private PaymentsClient mPaymentsClient;
     private List<PackagesDetails> mPackagesList;
 
+    private PackagesViewModel mPackagesViewModel;
+
     //*********************************************************************
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -77,6 +85,19 @@ public class PackagesActivity
     private void initControls()
     //*********************************************************************
     {
+       /* mPackagesViewModel = ViewModelProviders.of(PackagesActivity.this,
+                                                   new PackagesViewModelFactory(this))
+                                               .get(PackagesViewModel.class);
+
+
+        mPackagesViewModel.getMPackagesList()
+                          .observe(this, packagesDetails -> {
+
+                              if (mPackagesList == null)
+                                  return;
+                              mPackagesList = packagesDetails;
+
+                          });*/
         setTab();
         getPackagesList();
         mPaymentsClient =
