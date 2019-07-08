@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -21,7 +20,6 @@ import android.widget.CalendarView;
 import android.widget.TextView;
 
 import com.esafirm.imagepicker.features.ImagePicker;
-import com.esafirm.imagepicker.features.ReturnMode;
 import com.esafirm.imagepicker.model.Image;
 import com.example.editme.EditMe;
 import com.example.editme.R;
@@ -49,7 +47,6 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -61,7 +58,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import lombok.val;
 
 import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
-import static com.example.editme.utils.AndroidUtil.getApplicationContext;
 import static com.example.editme.utils.AndroidUtil.getContext;
 
 
@@ -155,9 +151,7 @@ public class PlaceOrderActivity
 
         cancel.setOnClickListener(view -> dialog.dismiss());
         if (mDueDate != null)
-        {
             calender.setDate(mDueDate.getTime());
-        }
 
         calender.setOnDateChangeListener(new CalendarView.OnDateChangeListener()
         {
@@ -165,12 +159,12 @@ public class PlaceOrderActivity
             public void onSelectedDayChange(CalendarView view, int year, int month,
                                             int dayOfMonth)
             {
-
                 Calendar calendar = Calendar.getInstance();
                 calendar.set(year, month, dayOfMonth);
                 mDueDate = calendar.getTime();
-                String startDate = new SimpleDateFormat(Constants.STANDARD_DATE_FORMAT).format(Calendar.getInstance()
-                                                                                     .getTime());
+                String startDate = new SimpleDateFormat(Constants.STANDARD_DATE_FORMAT).format(
+                        Calendar.getInstance()
+                                .getTime());
                 val endDate = dayOfMonth + "/" + (month + 1) + "/" + year;
                 getDaysBetweenDates(startDate, endDate);
 
@@ -190,7 +184,8 @@ public class PlaceOrderActivity
             //  AndroidUtil.toast(false, "Please select valid order of date");
             return;
         }
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.STANDARD_DATE_FORMAT,
+                                                           Locale.ENGLISH);
         Date startDate, endDate;
         long numberOfDays = 0;
         try
@@ -429,18 +424,20 @@ public class PlaceOrderActivity
     private void pickFromGallery()
     //**************************************************************
     {
-        final CharSequence[] items = { "Camera", "Gallery", "Cancel" };
+        final CharSequence[] items = { AndroidUtil.getString(
+                R.string.camera), AndroidUtil.getString(R.string.gallery),
+                AndroidUtil.getString(R.string.cancel) };
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setItems(items, new DialogInterface.OnClickListener()
         {
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                if (items[which] == "Camera")
+                if (items[which] == AndroidUtil.getString(R.string.camera))
                 {
                     showImageDialog();
                 }
-                else if (items[which] == "Gallery")
+                else if (items[which] == AndroidUtil.getString(R.string.gallery))
                 {
                     if (!checkPermission())
                     {
@@ -454,7 +451,8 @@ public class PlaceOrderActivity
                     intent.setType("image/*");
                     String[] mimeTypes = { "image/jpeg", "image/png" };
                     intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-                    startActivityForResult(intent.createChooser(intent, "Select file"),
+                    startActivityForResult(intent.createChooser(intent, AndroidUtil.getString(
+                            R.string.select_file)),
                                            GALLERY_REQUEST_CODE);
 
                 }
@@ -472,25 +470,8 @@ public class PlaceOrderActivity
     public void showImageDialog()
     //**********************************************
     {
-
-
-           /* ImagePicker.create(this)
-                       .returnMode(ReturnMode.ALL)
-                       .toolbarFolderTitle(AndroidUtil.getString(R.string.select_profile))
-                       .toolbarArrowColor(Color.WHITE)
-                       .theme(getPackageManager().getActivityInfo(getComponentName(), 0)
-                                                 .getThemeResource())
-                       //single()
-                       //.toolbarImageTitle(AndroidUtil.getString(R.string.select_profile))
-                       .showCamera(true)
-                       .includeVideo(false)
-                       //.theme(getTheme())
-                       .enableLog(true)
-                       .start();*/
-
         ImagePicker.cameraOnly()
                    .start(this);
-
     }
 
     //**************************************************************************
@@ -513,7 +494,6 @@ public class PlaceOrderActivity
                     Drawable d = new BitmapDrawable(getResources(), bitmap);
                     mEditImages.add(new EditImage("", mImageIntentURI, -1));
                     showImageDescriptionDialog(-1);
-                    //showDataOnRecyclerView();
                 }
                 catch (IOException e)
                 {
@@ -534,7 +514,6 @@ public class PlaceOrderActivity
                 Drawable d = new BitmapDrawable(getResources(), bitmap);
                 mEditImages.add(new EditImage("", mImageIntentURI, -1));
                 showImageDescriptionDialog(-1);
-                //showDataOnRecyclerView();
             }
             catch (IOException e)
             {
