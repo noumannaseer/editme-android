@@ -48,10 +48,14 @@ import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import lombok.NonNull;
 import lombok.val;
 
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.content.Context.MODE_PRIVATE;
+import static android.media.MediaRecorder.VideoSource.CAMERA;
 import static com.example.editme.utils.AndroidUtil.getApplicationContext;
 import static com.example.editme.utils.AndroidUtil.getResources;
 import static com.example.editme.utils.Constants.CHANNEL_ID;
@@ -526,6 +530,7 @@ public class UIUtils
         return dialog;
 
     }
+
 
 
     public static void showSnackBar(@NonNull Activity activity, @NonNull String message)

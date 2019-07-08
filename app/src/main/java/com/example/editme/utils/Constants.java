@@ -23,7 +23,7 @@ public class Constants
     public static final String DISPLAY_NAME = "displayName";
     public static final String PACKAGES = "packages";
     public static final String UPLOAD_COMPLETE = "downloadComplete";
-
+    public static final String STANDARD_DATE_FORMAT ="dd/MM/yyyy" ;
     //Notification parameter
     public static String VERBOSE_NOTIFICATION_CHANNEL_DESCRIPTION = "Shows notifications whenever work starts";
     public static final CharSequence NOTIFICATION_TITLE = "WorkRequest Starting";

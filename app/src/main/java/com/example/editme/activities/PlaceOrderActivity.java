@@ -1,5 +1,6 @@
 package com.example.editme.activities;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -48,14 +49,19 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import lombok.val;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static com.example.editme.utils.AndroidUtil.getApplicationContext;
 import static com.example.editme.utils.AndroidUtil.getContext;
 
 
@@ -66,6 +72,8 @@ public class PlaceOrderActivity
 //******************************************************************
 {
 
+    private static final int GALLERY_REQUEST_CODE = 121;
+    private static final int PERMISSION_READ_EXYTERNA_REQUEST_CODE = 1223;
     private ActivityPlaceOrderBinding mBinding;
     private Uri mImageIntentURI;
     private ArrayList<EditImage> mEditImages;
@@ -102,6 +110,7 @@ public class PlaceOrderActivity
         }
     }
 
+
     //******************************************************************
     private void initControls()
     //******************************************************************
@@ -109,7 +118,7 @@ public class PlaceOrderActivity
         mEditImages = new ArrayList<>();
         setTab();
         getParcelable();
-        mBinding.addImage.setOnClickListener(view -> showImageDialog());
+        mBinding.addImage.setOnClickListener(view -> pickFromGallery());
         mBinding.orderDescription.clearFocus();
         if (!mIsUpdate)
             mBinding.deliverDate.setOnClickListener(view -> showCalendar(mBinding.deliverDate));
@@ -145,6 +154,10 @@ public class PlaceOrderActivity
         select.setOnClickListener(view -> dialog.dismiss());
 
         cancel.setOnClickListener(view -> dialog.dismiss());
+        if (mDueDate != null)
+        {
+            calender.setDate(mDueDate.getTime());
+        }
 
         calender.setOnDateChangeListener(new CalendarView.OnDateChangeListener()
         {
@@ -156,7 +169,7 @@ public class PlaceOrderActivity
                 Calendar calendar = Calendar.getInstance();
                 calendar.set(year, month, dayOfMonth);
                 mDueDate = calendar.getTime();
-                String startDate = new SimpleDateFormat("dd/MM/yyyy").format(Calendar.getInstance()
+                String startDate = new SimpleDateFormat(Constants.STANDARD_DATE_FORMAT).format(Calendar.getInstance()
                                                                                      .getTime());
                 val endDate = dayOfMonth + "/" + (month + 1) + "/" + year;
                 getDaysBetweenDates(startDate, endDate);
@@ -367,7 +380,7 @@ public class PlaceOrderActivity
 
     //******************************************************************
     private void gotoCheckOutScreen()
-    //******************************************************************
+
     {
         val description = mBinding.orderDescription.getText()
                                                    .toString();
@@ -394,10 +407,64 @@ public class PlaceOrderActivity
         Intent checkOutIntent = new Intent(this, CheckOutActivity.class);
         checkOutIntent.putParcelableArrayListExtra(CheckOutActivity.IMAGES_LIST, mEditImages);
         checkOutIntent.putExtra(CheckOutActivity.ORDER_DESCRIPTION, description);
-        checkOutIntent.putExtra(CheckOutActivity.DUE_DATE, mDueDate);
+        checkOutIntent.putExtra(CheckOutActivity.DUE_DATE, mDueDate.getTime());
         checkOutIntent.putExtra(CheckOutActivity.DUE_DATE_STRING, mDueDateString);
 
         startActivityForResult(checkOutIntent, 111);
+
+    }
+
+    //*********************************************************
+    private boolean checkPermission()
+    //*********************************************************
+    {
+        int result = ContextCompat.checkSelfPermission(getApplicationContext(),
+                                                       READ_EXTERNAL_STORAGE);
+
+        return result == PackageManager.PERMISSION_GRANTED;
+    }
+
+
+    //**************************************************************
+    private void pickFromGallery()
+    //**************************************************************
+    {
+        final CharSequence[] items = { "Camera", "Gallery", "Cancel" };
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setItems(items, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                if (items[which] == "Camera")
+                {
+                    showImageDialog();
+                }
+                else if (items[which] == "Gallery")
+                {
+                    if (!checkPermission())
+                    {
+                        ActivityCompat.requestPermissions(PlaceOrderActivity.this,
+                                                          new String[] { READ_EXTERNAL_STORAGE },
+                                                          PERMISSION_READ_EXYTERNA_REQUEST_CODE);
+                        return;
+                    }
+                    Intent intent = new Intent(Intent.ACTION_PICK,
+                                               MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    intent.setType("image/*");
+                    String[] mimeTypes = { "image/jpeg", "image/png" };
+                    intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+                    startActivityForResult(intent.createChooser(intent, "Select file"),
+                                           GALLERY_REQUEST_CODE);
+
+                }
+                else
+                    dialog.dismiss();
+
+            }
+        });
+
+        builder.show();
 
     }
 
@@ -406,27 +473,23 @@ public class PlaceOrderActivity
     //**********************************************
     {
 
-        try
-        {
-            ImagePicker.create(this)
+
+           /* ImagePicker.create(this)
                        .returnMode(ReturnMode.ALL)
                        .toolbarFolderTitle(AndroidUtil.getString(R.string.select_profile))
                        .toolbarArrowColor(Color.WHITE)
                        .theme(getPackageManager().getActivityInfo(getComponentName(), 0)
                                                  .getThemeResource())
-                       .single()
-                       .toolbarImageTitle(AndroidUtil.getString(R.string.select_profile))
+                       //single()
+                       //.toolbarImageTitle(AndroidUtil.getString(R.string.select_profile))
                        .showCamera(true)
                        .includeVideo(false)
                        //.theme(getTheme())
                        .enableLog(true)
-                       .start();
+                       .start();*/
 
-        }
-        catch (PackageManager.NameNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+        ImagePicker.cameraOnly()
+                   .start(this);
 
     }
 
@@ -456,6 +519,26 @@ public class PlaceOrderActivity
                 {
                     e.printStackTrace();
                 }
+            }
+        }
+        else if (requestCode == GALLERY_REQUEST_CODE)
+        {
+            if (data == null)
+                return;
+            mImageIntentURI = data.getData();
+            try
+            {
+                val bitmap = MediaStore.Images.Media.getBitmap(
+                        getContentResolver(),
+                        mImageIntentURI);
+                Drawable d = new BitmapDrawable(getResources(), bitmap);
+                mEditImages.add(new EditImage("", mImageIntentURI, -1));
+                showImageDescriptionDialog(-1);
+                //showDataOnRecyclerView();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
             }
 
         }

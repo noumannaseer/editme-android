@@ -378,7 +378,7 @@ public class CheckOutActivity
             mEditImageList = getIntent().getExtras()
                                         .getParcelableArrayList(IMAGES_LIST);
 
-            mDueDate = getIntent().getParcelableExtra(DUE_DATE);
+            mDueDate = new Date(getIntent().getLongExtra(DUE_DATE, 0));
             mBinding.totalImages.setText("" + mEditImageList.size());
             mBinding.deliveryTime.setText(getIntent().getExtras()
                                                      .getString(DUE_DATE_STRING));
