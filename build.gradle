@@ -22,7 +22,7 @@ allprojects {
         jcenter()
         maven { url 'https://bintray.com/rameshbhupathi/maven' }
         maven { url "https://jitpack.io" }
-        
+
     }
 }
 

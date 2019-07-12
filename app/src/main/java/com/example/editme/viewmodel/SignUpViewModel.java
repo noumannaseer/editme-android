@@ -139,6 +139,7 @@ public class SignUpViewModel
                                                       , AndroidUtil.getString(
                                                               R.string.account_created),
                                                       context,
+                                                      AndroidUtil.getString(R.string.ok),
                                                       (dialog, which) ->
                                                       {
                                                           EditMe.instance()
@@ -148,7 +149,7 @@ public class SignUpViewModel
                                                           if (mListener != null)
                                                               mListener.onSignUpSuccessListener();
 
-                                                      }, AndroidUtil.getString(R.string.ok));
+                                                      });
 
                                           }
                                       });

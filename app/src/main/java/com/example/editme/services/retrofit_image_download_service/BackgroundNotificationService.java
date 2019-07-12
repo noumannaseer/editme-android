@@ -15,9 +15,11 @@ import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.editme.R;
 import com.example.editme.activities.HomeActivity;
 import com.example.editme.activities.ImageSliderActivity;
 import com.example.editme.model.OrderImages;
+import com.example.editme.utils.AndroidUtil;
 import com.example.editme.utils.Constants;
 import com.example.editme.utils.UIUtils;
 
@@ -45,18 +47,17 @@ public class BackgroundNotificationService
         super("Service");
     }
 
-    private NotificationCompat.Builder notificationBuilder;
-    private NotificationManager notificationManager;
+    private NotificationCompat.Builder mNotificationBuilder;
+    private NotificationManager mNotificationManager;
     private OrderImages mSelectedImage;
     public static String ORDER_IMAGES = "ORDER_IMAGES";
-//    private static int mChannelId = 0;
 
 
     @Override
     protected void onHandleIntent(Intent intent)
     {
 
-        notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         if (intent.getExtras()
                   .containsKey(ORDER_IMAGES))
         {
@@ -73,27 +74,24 @@ public class BackgroundNotificationService
             notificationChannel.enableLights(false);
             notificationChannel.setLightColor(Color.BLUE);
             notificationChannel.enableVibration(false);
-            notificationManager.createNotificationChannel(notificationChannel);
+            mNotificationManager.createNotificationChannel(notificationChannel);
         }
 
-        // Create an Intent for the activity you want to start
         Intent resultIntent = new Intent(this, HomeActivity.class);
         resultIntent.putExtra(Constants.IMAGE_DOWNLOADED, true);
-// Create the TaskStackBuilder and add the intent, which inflates the back stack
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
         stackBuilder.addNextIntentWithParentStack(resultIntent);
-// Get the PendingIntent containing the entire back stack
         PendingIntent resultPendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        notificationBuilder = new NotificationCompat.Builder(this, "id")
+        mNotificationBuilder = new NotificationCompat.Builder(this, "id")
                 .setSmallIcon(android.R.drawable.stat_sys_download)
-                .setContentTitle("Image")
-                .setContentText("Downloading Image")
+                .setContentTitle(AndroidUtil.getString(R.string.image))
+                .setContentText(AndroidUtil.getString(R.string.downloading_image))
                 .setDefaults(0)
                 .setContentIntent(resultPendingIntent)
                 .setAutoCancel(true);
-        notificationManager.notify(new Random().nextInt(50) + 1, notificationBuilder.build());
+        mNotificationManager.notify(new Random().nextInt(50) + 1, mNotificationBuilder.build());
 //        mChannelId++;
         initRetrofit();
 
@@ -183,9 +181,10 @@ public class BackgroundNotificationService
     {
 
 
-        notificationBuilder.setProgress(100, currentProgress, false);
-        notificationBuilder.setContentText("Downloaded: " + currentProgress + "%");
-        notificationManager.notify(0, notificationBuilder.build());
+        mNotificationBuilder.setProgress(100, currentProgress, false);
+        mNotificationBuilder.setContentText(
+                AndroidUtil.getString(R.string.dowload_progress_template, currentProgress));
+        mNotificationManager.notify(0, mNotificationBuilder.build());
     }
 
 
@@ -193,7 +192,7 @@ public class BackgroundNotificationService
     {
 
         Intent intent = new Intent(ImageSliderActivity.PROGRESS_UPDATE);
-        intent.putExtra("downloadComplete", downloadComplete);
+        intent.putExtra(Constants.UPLOAD_COMPLETE, downloadComplete);
         LocalBroadcastManager.getInstance(BackgroundNotificationService.this)
                              .sendBroadcast(intent);
     }
@@ -202,17 +201,19 @@ public class BackgroundNotificationService
     {
         sendProgressUpdate(downloadComplete);
 
-        notificationManager.cancel(0);
-        notificationBuilder.setProgress(0, 0, false);
-        notificationBuilder.setContentText("Image Download Complete");
-        notificationManager.notify(0, notificationBuilder.build());
+        mNotificationManager.cancel(0);
+        mNotificationBuilder.setProgress(0, 0, false);
+        mNotificationBuilder.setSmallIcon(android.R.drawable.stat_sys_download_done);
+        mNotificationBuilder.setContentText(
+                AndroidUtil.getString(R.string.image_download_complete));
+        mNotificationManager.notify(0, mNotificationBuilder.build());
 
     }
 
     @Override
     public void onTaskRemoved(Intent rootIntent)
     {
-        notificationManager.cancel(0);
+        mNotificationManager.cancel(0);
     }
 
 }

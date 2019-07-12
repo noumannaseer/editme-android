@@ -1,10 +1,10 @@
 package com.example.editme.activities;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -15,9 +15,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CalendarView;
+import android.widget.TextView;
 
 import com.esafirm.imagepicker.features.ImagePicker;
-import com.esafirm.imagepicker.features.ReturnMode;
 import com.esafirm.imagepicker.model.Image;
 import com.example.editme.EditMe;
 import com.example.editme.R;
@@ -36,15 +38,26 @@ import com.google.firebase.firestore.SetOptions;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import lombok.val;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static com.example.editme.utils.AndroidUtil.getContext;
 
 
@@ -55,16 +68,21 @@ public class PlaceOrderActivity
 //******************************************************************
 {
 
+    private static final int GALLERY_REQUEST_CODE = 121;
+    private static final int PERMISSION_READ_EXYTERNA_REQUEST_CODE = 1223;
     private ActivityPlaceOrderBinding mBinding;
     private Uri mImageIntentURI;
     private ArrayList<EditImage> mEditImages;
     private AddImagesCustomAdapter mAddImagesCustomAdapter;
     public static final String SELECTED_ORDER = "SELECTED_ORDER";
     public static final String SELECTED_INDEX = "SELECTED_INDEX";
-
     private Order mOrder;
     private boolean mIsUpdate = false;
+    public static String SHARED_SINGLE_IMAGE_URI = "SHARED_SINGLE_IMAGE_URI";
+    public static String SHARED_MULTIPLE_IMAGE_URI = "SHARED_MULTIPLE_IMAGE_URI";
 
+    private Date mDueDate;
+    private String mDueDateString;
 
     //******************************************************************
     @Override
@@ -88,17 +106,19 @@ public class PlaceOrderActivity
         }
     }
 
+
     //******************************************************************
     private void initControls()
     //******************************************************************
     {
+        mEditImages = new ArrayList<>();
         setTab();
         getParcelable();
-
-        mBinding.addImage.setOnClickListener(view -> showImageDialog());
-        mEditImages = new ArrayList<>();
+        mBinding.addImage.setOnClickListener(view -> pickFromGallery());
         mBinding.orderDescription.clearFocus();
-        if (mOrder != null)
+        if (!mIsUpdate)
+            mBinding.deliverDate.setOnClickListener(view -> showCalendar(mBinding.deliverDate));
+        if (mOrder != null && mEditImages == null)
         {
             mBinding.toolbarNext.setText(AndroidUtil.getString(R.string.update));
             mBinding.toolbarNext.setVisibility(View.VISIBLE);
@@ -108,12 +128,97 @@ public class PlaceOrderActivity
             loadImagesOnRecyclerView();
         }
         mBinding.toolbarNext.setOnClickListener(view -> {
-            if (mOrder == null)
+            if (mOrder == null || !mIsUpdate)
                 gotoCheckOutScreen();
             else
                 updateOrder();
         });
 
+    }
+
+    //*****************************************************************
+    public void showCalendar(@lombok.NonNull TextView textView)
+    //*****************************************************************
+    {
+
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.calender_dialog);
+        CalendarView calender = dialog.findViewById(R.id.calendarView1);
+        Button select = dialog.findViewById(R.id.select_date);
+        Button cancel = dialog.findViewById(R.id.cancel);
+
+        select.setOnClickListener(view -> dialog.dismiss());
+
+        cancel.setOnClickListener(view -> dialog.dismiss());
+        if (mDueDate != null)
+            calender.setDate(mDueDate.getTime());
+
+        calender.setOnDateChangeListener(new CalendarView.OnDateChangeListener()
+        {
+            @Override
+            public void onSelectedDayChange(CalendarView view, int year, int month,
+                                            int dayOfMonth)
+            {
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(year, month, dayOfMonth);
+                mDueDate = calendar.getTime();
+                String startDate = new SimpleDateFormat(Constants.STANDARD_DATE_FORMAT).format(
+                        Calendar.getInstance()
+                                .getTime());
+                val endDate = dayOfMonth + "/" + (month + 1) + "/" + year;
+                getDaysBetweenDates(startDate, endDate);
+
+            }
+        });
+        dialog.show();
+    }
+
+    //**********************************************************************************
+    private void getDaysBetweenDates(String start, String end)
+    //**********************************************************************************
+    {
+        if (start.equals(
+                AndroidUtil.getString(R.string.standard_date_format)) || end.equals(
+                AndroidUtil.getString(R.string.standard_date_format)))
+        {
+            //  AndroidUtil.toast(false, "Please select valid order of date");
+            return;
+        }
+        SimpleDateFormat dateFormat = new SimpleDateFormat(Constants.STANDARD_DATE_FORMAT,
+                                                           Locale.ENGLISH);
+        Date startDate, endDate;
+        long numberOfDays = 0;
+        try
+        {
+            startDate = dateFormat.parse(start);
+            endDate = dateFormat.parse(end);
+            numberOfDays = getUnitBetweenDates(startDate, endDate, TimeUnit.DAYS);
+        }
+        catch (ParseException e)
+        {
+            e.printStackTrace();
+        }
+        if (numberOfDays >= 1)
+        {
+
+            mDueDateString = AndroidUtil.getString(R.string.due_date, numberOfDays);
+            mBinding.deliverDate.setText(AndroidUtil.getString(R.string.days4, numberOfDays));
+            mBinding.deliverDate.setError(null);
+        }
+        else
+        {
+            mBinding.deliverDate.setText(AndroidUtil.getString(R.string.standard_date_format));
+        }
+
+    }
+
+    //**********************************************************************************
+    private static long getUnitBetweenDates(Date startDate, Date endDate, TimeUnit unit)
+    //**********************************************************************************
+    {
+        long timeDiff =
+                endDate.getTime() - startDate.getTime();
+        return unit.convert(timeDiff, TimeUnit.MILLISECONDS);
     }
 
     //******************************************************************
@@ -130,11 +235,38 @@ public class PlaceOrderActivity
     private void loadImagesOnRecyclerView()
     //******************************************************************
     {
+        attachSwipeToDeleteListener();
         OrderImagesListCustomAdapter orderImagesListCustomAdapter = new OrderImagesListCustomAdapter(
                 mOrder.getImages(), PlaceOrderActivity.this);
         mBinding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         mBinding.recyclerView.setAdapter(orderImagesListCustomAdapter);
 
+    }
+
+
+    //*********************************************************
+    private void attachSwipeToDeleteListener()
+    //*********************************************************
+    {
+        new ItemTouchHelper(
+                new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT)
+                {
+                    @Override
+                    public boolean onMove(@lombok.NonNull RecyclerView recyclerView, @lombok.NonNull RecyclerView.ViewHolder viewHolder, @lombok.NonNull RecyclerView.ViewHolder target)
+                    {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(@lombok.NonNull RecyclerView.ViewHolder viewHolder, int direction)
+                    {
+                        val index = viewHolder.getAdapterPosition();
+                        mEditImages.remove(index);
+                        if (mEditImages.size() == 0)
+                            mBinding.toolbarNext.setVisibility(View.GONE);
+                        mAddImagesCustomAdapter.notifyDataSetChanged();
+                    }
+                }).attachToRecyclerView(mBinding.recyclerView);
     }
 
     //******************************************************************
@@ -169,7 +301,8 @@ public class PlaceOrderActivity
                                   UIUtils.displayAlertDialog(
                                           AndroidUtil.getString(R.string.order_updated),
                                           AndroidUtil.getString(R.string.update),
-                                          PlaceOrderActivity.this,
+                                          PlaceOrderActivity.this
+                                          , AndroidUtil.getString(R.string.ok),
                                           new DialogInterface.OnClickListener()
                                           {
                                               @Override
@@ -184,7 +317,7 @@ public class PlaceOrderActivity
                                                   }
 
                                               }
-                                          }, AndroidUtil.getString(R.string.ok));
+                                          });
                               }
 
                           }
@@ -205,6 +338,33 @@ public class PlaceOrderActivity
                                     .getParcelable(SELECTED_ORDER);
                 mIsUpdate = true;
             }
+            else if (getIntent().getExtras()
+                                .containsKey(SHARED_SINGLE_IMAGE_URI))
+            {
+                mOrder = new Order();
+                Uri singleImageUri = getIntent().getExtras()
+                                                .getParcelable(SHARED_SINGLE_IMAGE_URI);
+                mEditImages = new ArrayList<>();
+                mEditImages.add(
+                        new EditImage(AndroidUtil.getString(R.string.your_image_description_here),
+                                      singleImageUri, -1));
+                showDataOnRecyclerView();
+            }
+
+            else if (getIntent().getExtras()
+                                .containsKey(SHARED_MULTIPLE_IMAGE_URI))
+            {
+                mOrder = new Order();
+                ArrayList<Uri> multipleImageUri = getIntent().getExtras()
+                                                             .getParcelableArrayList(
+                                                                     SHARED_MULTIPLE_IMAGE_URI);
+                mEditImages = new ArrayList<>();
+                for (val uri : multipleImageUri)
+                    mEditImages.add(new EditImage(
+                            AndroidUtil.getString(R.string.your_image_description_here), uri, -1));
+                showDataOnRecyclerView();
+            }
+
         }
         catch (Exception e)
         {
@@ -215,10 +375,12 @@ public class PlaceOrderActivity
 
     //******************************************************************
     private void gotoCheckOutScreen()
-    //******************************************************************
+
     {
         val description = mBinding.orderDescription.getText()
                                                    .toString();
+        val totalDays = mBinding.deliverDate.getText()
+                                            .toString();
         if (mEditImages.size() == 0)
         {
             UIUtils.showSnackBar(this, AndroidUtil.getString(R.string.please_add_image));
@@ -227,14 +389,80 @@ public class PlaceOrderActivity
         if (TextUtils.isEmpty(description))
         {
             mBinding.orderDescription.setError(AndroidUtil.getString(R.string.required));
+            mBinding.orderDescription.requestFocus();
             return;
         }
-
+        if (totalDays.equals(AndroidUtil.getString(R.string.standard_date_format)))
+        {
+            mBinding.deliverDate.setError(AndroidUtil.getString(R.string.required));
+            mBinding.deliverDate.requestFocus();
+            return;
+        }
 
         Intent checkOutIntent = new Intent(this, CheckOutActivity.class);
         checkOutIntent.putParcelableArrayListExtra(CheckOutActivity.IMAGES_LIST, mEditImages);
         checkOutIntent.putExtra(CheckOutActivity.ORDER_DESCRIPTION, description);
+        checkOutIntent.putExtra(CheckOutActivity.DUE_DATE, mDueDate.getTime());
+        checkOutIntent.putExtra(CheckOutActivity.DUE_DATE_STRING, mDueDateString);
+
         startActivityForResult(checkOutIntent, 111);
+
+    }
+
+    //*********************************************************
+    private boolean checkPermission()
+    //*********************************************************
+    {
+        int result = ContextCompat.checkSelfPermission(getApplicationContext(),
+                                                       READ_EXTERNAL_STORAGE);
+
+        return result == PackageManager.PERMISSION_GRANTED;
+    }
+
+
+    //**************************************************************
+    private void pickFromGallery()
+    //**************************************************************
+    {
+        final CharSequence[] items = { AndroidUtil.getString(
+                R.string.camera), AndroidUtil.getString(R.string.gallery),
+                AndroidUtil.getString(R.string.cancel) };
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setItems(items, new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                if (items[which] == AndroidUtil.getString(R.string.camera))
+                {
+                    showImageDialog();
+                }
+                else if (items[which] == AndroidUtil.getString(R.string.gallery))
+                {
+                    if (!checkPermission())
+                    {
+                        ActivityCompat.requestPermissions(PlaceOrderActivity.this,
+                                                          new String[] { READ_EXTERNAL_STORAGE },
+                                                          PERMISSION_READ_EXYTERNA_REQUEST_CODE);
+                        return;
+                    }
+                    Intent intent = new Intent(Intent.ACTION_PICK,
+                                               MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    intent.setType("image/*");
+                    String[] mimeTypes = { "image/jpeg", "image/png" };
+                    intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+                    startActivityForResult(intent.createChooser(intent, AndroidUtil.getString(
+                            R.string.select_file)),
+                                           GALLERY_REQUEST_CODE);
+
+                }
+                else
+                    dialog.dismiss();
+
+            }
+        });
+
+        builder.show();
 
     }
 
@@ -242,29 +470,8 @@ public class PlaceOrderActivity
     public void showImageDialog()
     //**********************************************
     {
-
-        try
-        {
-            ImagePicker.create(this)
-                       .returnMode(ReturnMode.ALL)
-                       .toolbarFolderTitle(AndroidUtil.getString(R.string.select_profile))
-                       .toolbarArrowColor(Color.WHITE)
-                       .theme(getPackageManager().getActivityInfo(getComponentName(), 0)
-                                                 .getThemeResource())
-                       .single()
-                       .toolbarImageTitle(AndroidUtil.getString(R.string.select_profile))
-                       .showCamera(true)
-                       .includeVideo(false)
-                       //.theme(getTheme())
-                       .enableLog(true)
-                       .start();
-
-        }
-        catch (PackageManager.NameNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-
+        ImagePicker.cameraOnly()
+                   .start(this);
     }
 
     //**************************************************************************
@@ -287,12 +494,30 @@ public class PlaceOrderActivity
                     Drawable d = new BitmapDrawable(getResources(), bitmap);
                     mEditImages.add(new EditImage("", mImageIntentURI, -1));
                     showImageDescriptionDialog(-1);
-                    //showDataOnRecyclerView();
                 }
                 catch (IOException e)
                 {
                     e.printStackTrace();
                 }
+            }
+        }
+        else if (requestCode == GALLERY_REQUEST_CODE)
+        {
+            if (data == null)
+                return;
+            mImageIntentURI = data.getData();
+            try
+            {
+                val bitmap = MediaStore.Images.Media.getBitmap(
+                        getContentResolver(),
+                        mImageIntentURI);
+                Drawable d = new BitmapDrawable(getResources(), bitmap);
+                mEditImages.add(new EditImage("", mImageIntentURI, -1));
+                showImageDescriptionDialog(-1);
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
             }
 
         }
@@ -402,16 +627,36 @@ public class PlaceOrderActivity
     }
 
 
+    //*********************************************************
+    @Override
+    public void onBackPressed()
+    //*********************************************************
+    {
+
+        UIUtils.displayAlertDialog("Order is not complete .Are you really want to exit?",
+                                   "Exit",
+                                   this, AndroidUtil.getString(R.string.yes),
+                                   AndroidUtil.getString(R.string.no),
+                                   new DialogInterface.OnClickListener()
+                                   {
+                                       @Override
+                                       public void onClick(DialogInterface dialog, int which)
+                                       {
+                                           if (which == -1)
+                                               PlaceOrderActivity.super.onBackPressed();
+                                       }
+                                   });
+    }
+
     //******************************************************************
     private void showDataOnRecyclerView()
     //******************************************************************
     {
         if (mEditImages.size() > 0)
             mBinding.toolbarNext.setVisibility(View.VISIBLE);
-
-
+        attachSwipeToDeleteListener();
         mAddImagesCustomAdapter = new AddImagesCustomAdapter(mEditImages,
-                                                             this, true, this, false);
+                                                             this, false, this, false);
         mBinding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
         mBinding.recyclerView.setAdapter(mAddImagesCustomAdapter);
 
@@ -463,7 +708,7 @@ public class PlaceOrderActivity
     {
         if (item.getItemId() == android.R.id.home)
         {
-            super.onBackPressed();
+            onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }

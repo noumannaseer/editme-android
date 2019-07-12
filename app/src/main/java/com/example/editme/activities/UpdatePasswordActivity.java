@@ -8,7 +8,6 @@ import com.example.editme.EditMe;
 import com.example.editme.R;
 import com.example.editme.databinding.ActivityUpdatePasswordBinding;
 import com.example.editme.utils.AndroidUtil;
-import com.example.editme.utils.UIUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;

@@ -171,7 +171,7 @@ public class OrderDetailsActivity
         mBinding.remainingTime.setText(UIUtils.getRemainingTime(mOrder.getDueDate()
                                                                       .getSeconds()));
         mBinding.status.setText(mOrder.getStatus());
-        mBinding.totalImages.setText(AndroidUtil.getString(R.string.photo_count_template,
+        mBinding.totalImages.setText(AndroidUtil.getString(R.plurals.photo_count_template,
                                                            mOrder.getImages()
                                                                  .size()));
 

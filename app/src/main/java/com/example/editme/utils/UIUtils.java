@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.editme.R;
+import com.example.editme.activities.HomeActivity;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserInfo;
@@ -47,10 +48,14 @@ import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import lombok.NonNull;
 import lombok.val;
 
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 import static android.content.Context.MODE_PRIVATE;
+import static android.media.MediaRecorder.VideoSource.CAMERA;
 import static com.example.editme.utils.AndroidUtil.getApplicationContext;
 import static com.example.editme.utils.AndroidUtil.getResources;
 import static com.example.editme.utils.Constants.CHANNEL_ID;
@@ -318,7 +323,7 @@ public class UIUtils
 
 
     //******************************************************************
-    public static void displayAlertDialog(String message, String title, Context context, DialogInterface.OnClickListener listerner, String positive)
+    public static void displayAlertDialog(String message, String title, Context context, String positive, DialogInterface.OnClickListener listerner)
     //******************************************************************
     {
 
@@ -332,7 +337,7 @@ public class UIUtils
     }
 
     //******************************************************************
-    public static void displayAlertDialog(String message, String title, Context context, DialogInterface.OnClickListener listerner, String positive, String negative)
+    public static void displayAlertDialog(String message, String title, Context context, String positive, String negative, DialogInterface.OnClickListener listerner)
     //******************************************************************
     {
 
@@ -527,6 +532,7 @@ public class UIUtils
     }
 
 
+
     public static void showSnackBar(@NonNull Activity activity, @NonNull String message)
     {
         val view = activity.getWindow()
@@ -534,6 +540,12 @@ public class UIUtils
                            .getRootView();
         Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
                 .show();
+    }
+
+    public static String getTagName(Context context)
+    {
+        return context.getClass()
+                      .getSimpleName();
     }
 
     public interface CheckBoxSingleItemListener
@@ -707,7 +719,8 @@ public class UIUtils
             return 1;
      /*   else if (user.getProviderId()
                      .equals("firebase"))
-     */       return 2;
+     */
+        return 2;
 
     }
 }

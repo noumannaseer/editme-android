@@ -3,6 +3,7 @@ package com.example.editme.fragments;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,11 +21,14 @@ import com.example.editme.databinding.FragmentOrderBinding;
 import com.example.editme.databinding.LoginDialogBinding;
 import com.example.editme.databinding.SignupDialogBinding;
 import com.example.editme.model.User;
+import com.example.editme.utils.AndroidUtil;
 import com.example.editme.utils.UIUtils;
 import com.example.editme.viewmodel.LoginViewModel;
 import com.example.editme.viewmodel.SignUpViewModel;
 import com.example.editme.viewmodelfactory.LoginViewModelFactory;
 import com.example.editme.viewmodelfactory.SignUpViewModelFactory;
+
+import java.util.ArrayList;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -86,6 +90,9 @@ public class OrderFragment
                   .getMAuth()
                   .getCurrentUser() == null)
             displayLoginDialog();
+        else
+            getImagesDataFromActivity();
+
 
         mBinding.placeOrder.setOnClickListener(view -> {
             if (EditMe.instance()
@@ -96,8 +103,9 @@ public class OrderFragment
                 val user = EditMe.instance()
                                  .getMAuth()
                                  .getCurrentUser();
-
-                if (!UIUtils.getPackageStatus())
+                if (EditMe.instance()
+                          .getMUserDetail()
+                          .getCurrentPackage() == null)
                 {
                     gotoPackagesScreen();
                 }
@@ -107,6 +115,7 @@ public class OrderFragment
             else
                 displayLoginDialog();
         });
+
     }
 
     //*************************************************************************************
@@ -166,9 +175,7 @@ public class OrderFragment
                 LayoutInflater.from(getContext()), R.layout.login_dialog, null, false);
         mLoginDialog.setContentView(mLoginDialogBinding.getRoot());
         mLoginDialog.setCancelable(false);
-
         mLoginDialog.show();
-
 
         if (loginViewModel == null)
         {
@@ -229,12 +236,71 @@ public class OrderFragment
     @Override
     public void onLoginSuccessFull()
     {
-        mLoginDialog.dismiss();
+        EditMe.instance()
+              .loadUserDetail();
+
+        AndroidUtil.handler.postDelayed(() -> {
+            mLoginDialog.dismiss();
+            if (EditMe.instance()
+                      .getMUserDetail()
+                      .getCurrentPackage() == null)
+            {
+
+                UIUtils.showSnackBar(getActivity(), AndroidUtil.getString(R.string.please_package));
+
+            }
+            else
+            {
+                getImagesDataFromActivity();
+
+            }
+        }, 2000);
 
     }
 
+
+    //*********************************************************************
+    private void getImagesDataFromActivity()
+    //*********************************************************************
+    {
+
+        val multipleImageUri = ((HomeActivity)getActivity()).getMMultipleImageUri();
+        val singleImageUri = ((HomeActivity)getActivity()).getMSingleImageUri();
+
+        if (multipleImageUri != null)
+        {
+            gotoPlaceOrderScreenWithMultipleImage(new ArrayList<>(multipleImageUri));
+        }
+        else if (((HomeActivity)getActivity()).getMSingleImageUri() != null)
+        {
+            gotoPlaceOrderScreenWithSingleImage(singleImageUri);
+        }
+    }
+
+    //********************************************************************************
+    private void gotoPlaceOrderScreenWithMultipleImage(ArrayList<Uri> uriList)
+    //********************************************************************************
+    {
+        Intent placeOrderIntent = new Intent(getActivity(), PlaceOrderActivity.class);
+        placeOrderIntent.putParcelableArrayListExtra(PlaceOrderActivity.SHARED_MULTIPLE_IMAGE_URI,
+                                                     uriList);
+        startActivity(placeOrderIntent);
+
+    }
+
+    //********************************************************************************
+    private void gotoPlaceOrderScreenWithSingleImage(Uri singleImageUri)
+    //********************************************************************************
+    {
+        Intent placeOrderIntent = new Intent(getActivity(), PlaceOrderActivity.class);
+        placeOrderIntent.putExtra(PlaceOrderActivity.SHARED_SINGLE_IMAGE_URI, singleImageUri);
+        startActivity(placeOrderIntent);
+    }
+
+    //********************************************************************************
     @Override
     public void onSignUpSuccessListener()
+    //********************************************************************************
     {
         mSignUpDialog.dismiss();
         mSignUpDialog = null;
@@ -243,7 +309,7 @@ public class OrderFragment
     }
 
     //**********************************************
-    interface AccountRegistrationListener
+    interface AccountRegistrationListen
             //**********************************************
     {
         void onAccountCreatedSuccessfully(String userId);

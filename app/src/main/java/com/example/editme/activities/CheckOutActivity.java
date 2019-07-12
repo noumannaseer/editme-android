@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
@@ -40,6 +41,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -67,7 +69,12 @@ public class CheckOutActivity
     private List<OrderImages> mOrderImageList;
     private StorageReference mStorage;
     private Date mDueDate;
+    private String mDueDateString;
+
     public static String PROGRESS_UPDATE = "PROGRESS_UPDATE";
+    public static String DUE_DATE = "DUE_DATE";
+    public static String DUE_DATE_STRING = "DUE_DATE_STRING";
+
 
     //******************************************************************
     @Override
@@ -86,8 +93,9 @@ public class CheckOutActivity
     //******************************************************************
     {
         getParcelable();
+        setTab();
         mBinding.placeOrder.setOnClickListener(view -> uploadImages());
-        mBinding.deliveryTimeLayout.setOnClickListener(view -> showCalendar(mBinding.deliveryTime));
+//        mBinding.deliveryTimeLayout.setOnClickListener(view -> showCalendar(mBinding.deliveryTime));
 
         if (mEditImageList != null)
         {
@@ -100,91 +108,18 @@ public class CheckOutActivity
         }
     }
 
-    //*****************************************************************
-    public void showCalendar(@NonNull TextView textView)
-    //*****************************************************************
+    //******************************************************************
+    private void setTab()
+    //******************************************************************
     {
-
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.calender_dialog);
-        CalendarView calender = dialog.findViewById(R.id.calendarView1);
-        Button select = dialog.findViewById(R.id.select_date);
-        Button cancel = dialog.findViewById(R.id.cancel);
-
-        select.setOnClickListener(view -> dialog.dismiss());
-
-        cancel.setOnClickListener(view -> dialog.dismiss());
-
-        calender.setOnDateChangeListener(new CalendarView.OnDateChangeListener()
-        {
-            @Override
-            public void onSelectedDayChange(CalendarView view, int year, int month,
-                                            int dayOfMonth)
-            {
-
-                Calendar calendar = Calendar.getInstance();
-                calendar.set(year, month, dayOfMonth);
-                mDueDate = calendar.getTime();
-
-                String startDate = new SimpleDateFormat("dd/MM/yyyy").format(Calendar.getInstance()
-                                                                                     .getTime());
-                val endDate = dayOfMonth + "/" + (month + 1) + "/" + year;
-                getDaysBetweenDates(startDate, endDate);
-
-            }
-        });
-        dialog.show();
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
 
-    //**********************************************************************************
-    private void getDaysBetweenDates(String start, String end)
-    //**********************************************************************************
-    {
-        if (start.equals(
-                AndroidUtil.getString(R.string.standard_date_format)) || end.equals(
-                AndroidUtil.getString(R.string.standard_date_format)))
-        {
-            //  AndroidUtil.toast(false, "Please select valid order of date");
-            return;
-        }
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
-        Date startDate, endDate;
-        long numberOfDays = 0;
-        try
-        {
-            startDate = dateFormat.parse(start);
-            endDate = dateFormat.parse(end);
-            numberOfDays = getUnitBetweenDates(startDate, endDate, TimeUnit.DAYS);
-        }
-        catch (ParseException e)
-        {
-            e.printStackTrace();
-        }
-        if (numberOfDays > 1)
-        {
-            mBinding.deliveryTime.setText(
-                    "" + (int)numberOfDays + AndroidUtil.getString(R.string.days4));
-        }
-        else
-        {
-            mBinding.deliveryTime.setText("");
-            AndroidUtil.toast(false,
-                              AndroidUtil.getString(R.string.please_select_a_valid_date_order));
-            mDueDate = null;
 
-        }
-
-    }
-
-    //**********************************************************************************
-    private static long getUnitBetweenDates(Date startDate, Date endDate, TimeUnit unit)
-    //**********************************************************************************
-    {
-        long timeDiff =
-                endDate.getTime() - startDate.getTime();
-        return unit.convert(timeDiff, TimeUnit.MILLISECONDS);
-    }
 
 
     List<OneTimeWorkRequest> mOneTimeWorkRequestsList;
@@ -359,7 +294,11 @@ public class CheckOutActivity
                                            .getString(ORDER_DESCRIPTION);
             mEditImageList = getIntent().getExtras()
                                         .getParcelableArrayList(IMAGES_LIST);
+
+            mDueDate = new Date(getIntent().getLongExtra(DUE_DATE, 0));
             mBinding.totalImages.setText("" + mEditImageList.size());
+            mBinding.deliveryTime.setText(getIntent().getExtras()
+                                                     .getString(DUE_DATE_STRING));
         }
 
     }
@@ -391,6 +330,17 @@ public class CheckOutActivity
         finish();
     }
 
+    //******************************************************************
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    //******************************************************************
+    {
+        if (item.getItemId() == android.R.id.home)
+        {
+            onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     //******************************************************************
     @Override
