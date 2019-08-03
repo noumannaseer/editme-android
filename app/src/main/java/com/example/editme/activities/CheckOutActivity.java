@@ -28,6 +28,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.storage.StorageReference;
 
 import java.text.ParseException;
@@ -40,6 +41,7 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
@@ -49,7 +51,6 @@ import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
-import lombok.NonNull;
 import lombok.val;
 
 
@@ -117,9 +118,6 @@ public class CheckOutActivity
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
-
-
-
 
 
     List<OneTimeWorkRequest> mOneTimeWorkRequestsList;
@@ -265,13 +263,15 @@ public class CheckOutActivity
                                         .getMFireStore()
                                         .collection(Constants.Users)
                                         .document(userId)
-                                        .update("currentPackage", packagesDetails)
-                                        .addOnSuccessListener(
-                                                new OnSuccessListener<Void>()
+                                        .update("currentPackage.remainingImages",
+                                                FieldValue.increment(-mEditImageList.size()))
+                                        .addOnCompleteListener(
+                                                new OnCompleteListener<Void>()
                                                 {
                                                     @Override
-                                                    public void onSuccess(Void aVoid)
+                                                    public void onComplete(@NonNull Task<Void> task)
                                                     {
+
                                                         UIUtils.testToast(false, "Order posted");
                                                         gotoBack();
                                                     }

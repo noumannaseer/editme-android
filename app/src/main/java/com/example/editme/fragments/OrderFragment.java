@@ -174,6 +174,7 @@ public class OrderFragment
         mLoginDialogBinding = DataBindingUtil.inflate(
                 LayoutInflater.from(getContext()), R.layout.login_dialog, null, false);
         mLoginDialog.setContentView(mLoginDialogBinding.getRoot());
+
         mLoginDialog.setCancelable(false);
         mLoginDialog.show();
 

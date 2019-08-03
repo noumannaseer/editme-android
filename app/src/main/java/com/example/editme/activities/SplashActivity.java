@@ -2,7 +2,9 @@ package com.example.editme.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.EditText;
 
+import com.example.editme.EditMe;
 import com.example.editme.R;
 import com.example.editme.fragments.HomeFragment;
 import com.example.editme.utils.AndroidUtil;
@@ -30,7 +32,10 @@ public class SplashActivity
     private void initControls()
     //********************************************************************
     {
-        gotoWelcomeScreen();
+
+
+        //gotoWelcomeScreen();
+
     }
 
 

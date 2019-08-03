@@ -80,7 +80,6 @@ public class PlaceOrderActivity
     private boolean mIsUpdate = false;
     public static String SHARED_SINGLE_IMAGE_URI = "SHARED_SINGLE_IMAGE_URI";
     public static String SHARED_MULTIPLE_IMAGE_URI = "SHARED_MULTIPLE_IMAGE_URI";
-
     private Date mDueDate;
     private String mDueDateString;
 
