@@ -35,6 +35,7 @@ public class LoginActivity
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_login);
         initControls();
 
+
     }
 
     //**************************************************************

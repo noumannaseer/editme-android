@@ -87,7 +87,7 @@
     <string name="next">Next</string>
     <string name="please_add_image">Please add image first</string>
     <string name="total_images">Total images</string>
-    <string name="remaining_images">Remaining images</string>
+    <string name="remaining_images">Remaining images </string>
     <string name="delivery_time">Delivery date</string>
 
 
@@ -171,5 +171,7 @@
     <string name="camera">Camera</string>
     <string name="gallery">Gallery</string>
     <string name="select_file">Select file</string>
+    <string name="change_number">Change number</string>
+    <string name="total_images_template">Out of %1$d</string>
 
 </resources>
