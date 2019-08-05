@@ -60,11 +60,11 @@ public class FaceBookLoginActivity
     //*******************************************************************
     {
         LoginManager.getInstance()
-                    .logInWithReadPermissions(
-                            this,
-                            Arrays.asList(Constants.EMAIL));
+                .logInWithReadPermissions(
+                        this,
+                        Arrays.asList(Constants.EMAIL));
         LoginManager.getInstance()
-                    .setLoginBehavior(LoginBehavior.DEVICE_AUTH);
+                .setLoginBehavior(LoginBehavior.DEVICE_AUTH);
 
         addLoginSuccessListener();
     }
@@ -76,35 +76,31 @@ public class FaceBookLoginActivity
         callbackManager = CallbackManager.Factory.create();
         // Callback registration
         LoginManager.getInstance()
-                    .registerCallback(
-                            callbackManager,
-                            new FacebookCallback<LoginResult>()
-                            {
-                                @Override
-                                public void onSuccess(LoginResult loginResult)
-                                {
-                                    UIUtils.testToast(false, AndroidUtil.getString(
-                                            R.string.fb_login_successs));
-                                    handleFaceBookToken(loginResult.getAccessToken());
+                .registerCallback(
+                        callbackManager,
+                        new FacebookCallback<LoginResult>() {
+                            @Override
+                            public void onSuccess(LoginResult loginResult) {
+                                UIUtils.testToast(false, AndroidUtil.getString(
+                                        R.string.fb_login_successs));
+                                handleFaceBookToken(loginResult.getAccessToken());
 
-                                }
-
-                                @Override
-                                public void onCancel()
-                                {
-                                    UIUtils.testToast(false, AndroidUtil.getString(
-                                            R.string.fb_login_cancel));
-                                    FaceBookLoginActivity.super.onBackPressed();
-                                }
-
-                                @Override
-                                public void onError(FacebookException exception)
-                                {
-                                    UIUtils.testToast(false, exception.getLocalizedMessage());
-                                    FaceBookLoginActivity.super.onBackPressed();
-                                }
                             }
-                    );
+
+                            @Override
+                            public void onCancel() {
+                                UIUtils.testToast(false, AndroidUtil.getString(
+                                        R.string.fb_login_cancel));
+                                FaceBookLoginActivity.super.onBackPressed();
+                            }
+
+                            @Override
+                            public void onError(FacebookException exception) {
+                                UIUtils.testToast(false, exception.getLocalizedMessage());
+                                FaceBookLoginActivity.super.onBackPressed();
+                            }
+                        }
+                );
     }
 
     //*********************************************************************
@@ -115,27 +111,24 @@ public class FaceBookLoginActivity
         mBinding.progressView.setVisibility(View.VISIBLE);
         AuthCredential credential = FacebookAuthProvider.getCredential(accessToken.getToken());
         EditMe.instance()
-              .getMAuth()
-              .signInWithCredential(credential)
-              .addOnCompleteListener(
-                      new OnCompleteListener<AuthResult>()
-                      {
-                          @Override
-                          public void onComplete(@androidx.annotation.NonNull Task<AuthResult> task)
-                          {
-                              if (task.isSuccessful())
-                              {
-                                  FirebaseUser user = EditMe.instance()
-                                                            .getMAuth()
-                                                            .getCurrentUser();
+                .getMAuth()
+                .signInWithCredential(credential)
+                .addOnCompleteListener(
+                        new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@androidx.annotation.NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    FirebaseUser user = EditMe.instance()
+                                            .getMAuth()
+                                            .getCurrentUser();
 
-                                  signUpFaceBook(user.getDisplayName(), user.getEmail(),
-                                                 user.getUid(),
-                                                 user.getPhotoUrl() + "?height=500");
-                              }
+                                    signUpFaceBook(user.getDisplayName(), user.getEmail(),
+                                            user.getUid(),
+                                            user.getPhotoUrl() + "?height=500");
+                                }
 
-                          }
-                      });
+                            }
+                        });
     }
 
     //*********************************************************************
@@ -144,11 +137,9 @@ public class FaceBookLoginActivity
     {
         String facebookUserId = "";
         // find the Facebook profile and get the user's id
-        for (UserInfo profile : user.getProviderData())
-        {
+        for (UserInfo profile : user.getProviderData()) {
             // check if the provider id matches "facebook.com"
-            if (FacebookAuthProvider.PROVIDER_ID.equals(profile.getProviderId()))
-            {
+            if (FacebookAuthProvider.PROVIDER_ID.equals(profile.getProviderId())) {
                 facebookUserId = profile.getUid();
             }
         }
@@ -170,49 +161,44 @@ public class FaceBookLoginActivity
     //**********************************************************************************************
     {
         EditMe.instance()
-              .getMFireStore()
-              .collection(Constants.Users)
-              .document(userId)
-              .set(new User(displayName, email, userId, photoUrl, null))
-              .addOnCompleteListener(
-                      new OnCompleteListener<Void>()
-                      {
-                          @Override
-                          public void onComplete(@androidx.annotation.NonNull Task<Void> task)
-                          {
-                              EditMe.instance()
-                                    .loadUserDetail();
-                              updateFCMToken();
-                          }
-                      });
+                .getMFireStore()
+                .collection(Constants.Users)
+                .document(userId)
+                .set(new User(displayName, email, userId, photoUrl, null))
+                .addOnCompleteListener(
+                        new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@androidx.annotation.NonNull Task<Void> task) {
+                                EditMe.instance()
+                                        .loadUserDetail();
+                                updateFCMToken();
+                            }
+                        });
     }
 
-    private void updateFCMToken()
-    {
+    private void updateFCMToken() {
         String instanceId = FirebaseInstanceId.getInstance()
-                                              .getToken();
+                .getToken();
         Map<String, Object> fcmToken = new HashMap<>();
         fcmToken.put(Constants.FCM_TOKEN, instanceId);
         EditMe.instance()
-              .loadUserDetail();
+                .loadUserDetail();
         EditMe.instance()
-              .getMFireStore()
-              .collection(Constants.Users)
-              .document(EditMe.instance()
-                              .getMUserId())
-              .update(fcmToken)
-              .addOnCompleteListener(
-                      new OnCompleteListener<Void>()
-                      {
-                          @Override
-                          public void onComplete(@androidx.annotation.NonNull Task<Void> task)
-                          {
+                .getMFireStore()
+                .collection(Constants.Users)
+                .document(EditMe.instance()
+                        .getMUserId())
+                .update(fcmToken)
+                .addOnCompleteListener(
+                        new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@androidx.annotation.NonNull Task<Void> task) {
 
-                              mBinding.progressView.setVisibility(View.GONE);
-                              FaceBookLoginActivity.super.onBackPressed();
+                                mBinding.progressView.setVisibility(View.GONE);
+                                FaceBookLoginActivity.super.onBackPressed();
 
-                          }
-                      });
+                            }
+                        });
     }
 
 }

@@ -16,6 +16,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.storage.FirebaseStorage;
 
 import javax.annotation.Nullable;
@@ -32,12 +33,22 @@ public class EditMe
 {
 
 
-    @Getter private FirebaseAuth mAuth;
-    @Getter private FirebaseFirestore mFireStore;
-    @Getter private AccessToken mFaceBookAccessToken;
-    @Getter private String mUserId;
-    @Getter private User mUserDetail;
-    @Getter private FirebaseStorage mStorageReference;
+    @Getter
+    private FirebaseAuth mAuth;
+    @Getter
+    private FirebaseFirestore mFireStore;
+    @Getter
+    private AccessToken mFaceBookAccessToken;
+    @Getter
+    private String mUserId;
+    @Getter
+    private User mUserDetail;
+    @Getter
+    private FirebaseStorage mStorageReference;
+    @Getter
+    private FirebaseFunctions firebaseFunctions;
+    @Getter
+    private String mStripeKey;
 
     //**************************************************************************
     @Override
@@ -56,7 +67,10 @@ public class EditMe
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(this);
         mStorageReference = FirebaseStorage.getInstance();
+        firebaseFunctions = FirebaseFunctions.getInstance(app, "us-central1");
         loadUserDetail();
+        getStripeKeyFromDatabase();
+        mStripeKey = "pk_test_MTaMbNd25WpLdWZCuQgww49W003ZcNOmDk";
     }
 
     //*********************************************************************
@@ -73,7 +87,7 @@ public class EditMe
     EditMe instance()
     //*********************************************************************
     {
-        return (EditMe)AndroidUtil.getApplicationContext();
+        return (EditMe) AndroidUtil.getApplicationContext();
 
     }
 
@@ -84,22 +98,40 @@ public class EditMe
     {
         if (getMAuth().getCurrentUser() != null)
             mUserId = getMAuth().getCurrentUser()
-                                .getUid();
+                    .getUid();
         if (mUserId == null)
             return;
         EditMe.instance()
-              .getMFireStore()
-              .collection(Constants.Users)
-              .document(mUserId)
-              .addSnapshotListener(new EventListener<DocumentSnapshot>()
-              {
-                  @Override
-                  public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e)
-                  {
-                      mUserDetail = documentSnapshot.toObject(User.class);
+                .getMFireStore()
+                .collection(Constants.Users)
+                .document(mUserId)
+                .addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
+                        mUserDetail = documentSnapshot.toObject(User.class);
 
-                  }
-              });
+                    }
+                });
     }
+
+    private void getStripeKeyFromDatabase() {
+//        this.getMDataBaseInstance()
+//                .getReference("keys")
+//                .child("stripeKey")
+//                .addValueEventListener(
+//                        new ValueEventListener() {
+//                            @Override
+//                            public void onDataChange(@androidx.annotation.NonNull DataSnapshot dataSnapshot) {
+//                                mStripeKey = dataSnapshot.getValue()
+//                                        .toString();
+//
+//                            }
+//
+//                            @Override
+//                            public void onCancelled(@androidx.annotation.NonNull DatabaseError databaseError) {
+//                            }
+//                        });
+    }
+
 
 }

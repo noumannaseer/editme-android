@@ -30,6 +30,7 @@ import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
 import lombok.val;
 
 
@@ -73,22 +74,17 @@ public class OrderDetailsActivity
         mBinding.modifyOrder.setOnClickListener(view -> gotoPlaceOrderScreen());
         mBinding.completeOrder.setOnClickListener(view -> completeOrder());
         mBinding.downloadImages.setOnClickListener(view -> {
-            if (!checkPermission())
-            {
+            if (!checkPermission()) {
                 requestPermission();
                 return;
-
             }
             for (int i = 0; i < mOrder.getImages()
-                                      .size(); i++)
-            {
-
+                    .size(); i++) {
                 startImageDownload(i);
             }
             super.onBackPressed();
         });
-        if (mOrder != null)
-        {
+        if (mOrder != null) {
             setData();
             showImagesOnRecyclerView();
         }
@@ -112,19 +108,17 @@ public class OrderDetailsActivity
         showProgressView();
         mOrder.setStatus(Constants.STATUS_COMPLETE);
         EditMe.instance()
-              .getMFireStore()
-              .collection(Constants.ORDERS)
-              .document(mOrder.getOrderId())
-              .set(mOrder)
-              .addOnCompleteListener(new OnCompleteListener<Void>()
-              {
-                  @Override
-                  public void onComplete(@NonNull Task<Void> task)
-                  {
-                      gotoBack();
-                      hideProgressView();
-                  }
-              });
+                .getMFireStore()
+                .collection(Constants.ORDERS)
+                .document(mOrder.getOrderId())
+                .set(mOrder)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        gotoBack();
+                        hideProgressView();
+                    }
+                });
     }
 
     //*************************************************************************************
@@ -167,13 +161,13 @@ public class OrderDetailsActivity
             return;
         mBinding.orderDescription.setText(mOrder.getDescription());
         mBinding.orderDate.setText(UIUtils.getDate(mOrder.getOrderDate()
-                                                         .getSeconds()));
+                .getSeconds()));
         mBinding.remainingTime.setText(UIUtils.getRemainingTime(mOrder.getDueDate()
-                                                                      .getSeconds()));
+                .getSeconds()));
         mBinding.status.setText(mOrder.getStatus());
         mBinding.totalImages.setText(AndroidUtil.getString(R.plurals.photo_count_template,
-                                                           mOrder.getImages()
-                                                                 .size()));
+                mOrder.getImages()
+                        .size()));
 
     }
 
@@ -182,40 +176,34 @@ public class OrderDetailsActivity
     //*************************************************************************************
     {
         if (getIntent().getExtras()
-                       .containsKey(SELECTED_ORDER))
-        {
+                .containsKey(SELECTED_ORDER)) {
             mOrder = getIntent().getExtras()
-                                .getParcelable(SELECTED_ORDER);
+                    .getParcelable(SELECTED_ORDER);
             if (mOrder.getStatus()
-                      .equals(Constants.STATUS_COMPLETE))
-            {
+                    .equals(Constants.STATUS_COMPLETE)) {
                 mBinding.downloadImages.setVisibility(View.VISIBLE);
                 mBinding.modifyOrder.setVisibility(View.GONE);
                 mBinding.completeOrder.setVisibility(View.GONE);
             }
 
-        }
-        else if (getIntent().getExtras()
-                            .containsKey(ORDER_ID))
-        {
+        } else if (getIntent().getExtras()
+                .containsKey(ORDER_ID)) {
             val orderId = getIntent().getExtras()
-                                     .getString(ORDER_ID);
+                    .getString(ORDER_ID);
             EditMe.instance()
-                  .getMFireStore()
-                  .collection(Constants.ORDERS)
-                  .document(orderId)
-                  .get()
-                  .addOnSuccessListener(
-                          new OnSuccessListener<DocumentSnapshot>()
-                          {
-                              @Override
-                              public void onSuccess(DocumentSnapshot documentSnapshot)
-                              {
-                                  mOrder = documentSnapshot.toObject(Order.class);
-                                  setData();
-                                  showImagesOnRecyclerView();
-                              }
-                          });
+                    .getMFireStore()
+                    .collection(Constants.ORDERS)
+                    .document(orderId)
+                    .get()
+                    .addOnSuccessListener(
+                            new OnSuccessListener<DocumentSnapshot>() {
+                                @Override
+                                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                    mOrder = documentSnapshot.toObject(Order.class);
+                                    setData();
+                                    showImagesOnRecyclerView();
+                                }
+                            });
         }
     }
 
@@ -227,7 +215,7 @@ public class OrderDetailsActivity
 
         Intent intent = new Intent(this, BackgroundNotificationService.class);
         intent.putExtra(BackgroundNotificationService.ORDER_IMAGES, mOrder.getImages()
-                                                                          .get(index));
+                .get(index));
         startService(intent);
 
     }
@@ -237,7 +225,7 @@ public class OrderDetailsActivity
     //*************************************************************************************
     {
         int result = ContextCompat.checkSelfPermission(this,
-                                                       Manifest.permission.WRITE_EXTERNAL_STORAGE);
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
         return result == PackageManager.PERMISSION_GRANTED;
     }
 
@@ -247,8 +235,8 @@ public class OrderDetailsActivity
     {
 
         ActivityCompat.requestPermissions(this,
-                                          new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE },
-                                          PERMISSION_REQUEST_CODE);
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                PERMISSION_REQUEST_CODE);
 
     }
 
@@ -271,8 +259,7 @@ public class OrderDetailsActivity
         super.onActivityResult(requestCode, resultCode, data);
 
         if (data != null && data.getExtras()
-                                .containsKey(Constants.ORDER_UPDATED))
-        {
+                .containsKey(Constants.ORDER_UPDATED)) {
             gotoBack();
         }
 
@@ -282,13 +269,12 @@ public class OrderDetailsActivity
     public boolean onOptionsItemSelected(MenuItem item)
     //**************************************************************
     {
-        switch (item.getItemId())
-        {
-        case android.R.id.home:
-            super.onBackPressed();
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                super.onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 

@@ -1,49 +1,49 @@
 {
   "project_info": {
-    "project_number": "353297968661",
-    "firebase_url": "https://edit-me-a0e6d.firebaseio.com",
-    "project_id": "edit-me-a0e6d",
-    "storage_bucket": "edit-me-a0e6d.appspot.com"
+    "project_number": "712176061851",
+    "firebase_url": "https://edit-9870e.firebaseio.com",
+    "project_id": "edit-9870e",
+    "storage_bucket": "edit-9870e.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:353297968661:android:af8a96ae3927f127",
+        "mobilesdk_app_id": "1:712176061851:android:af8a96ae3927f127",
         "android_client_info": {
           "package_name": "com.example.editme"
         }
       },
       "oauth_client": [
         {
-          "client_id": "353297968661-fkh3af9eevo2hec458g6dp30busg6l7u.apps.googleusercontent.com",
+          "client_id": "712176061851-4ccl07skcunmutg55j4q4qtg9208i5hk.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.editme",
-            "certificate_hash": "3c66b6fedd5ed9ef144f2942a33c057cce0530a6"
+            "certificate_hash": "d4d9093cff1f2ca02a56403fcf9731b5e02939bb"
           }
         },
         {
-          "client_id": "353297968661-gnhdd5rohvs4srmaq830kn0hq5fhi93m.apps.googleusercontent.com",
+          "client_id": "712176061851-0fv4nbebn72mjvrbgdcdumri48r6teaa.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDAtH8lGJlc2QrbmOhXF5GmDzCPulJGyZI"
+          "current_key": "AIzaSyCCZRUMU2vNlLHMyTR4yyKEWfm5ZmxD45Q"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "353297968661-gnhdd5rohvs4srmaq830kn0hq5fhi93m.apps.googleusercontent.com",
+              "client_id": "712176061851-0fv4nbebn72mjvrbgdcdumri48r6teaa.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "353297968661-d4svphlofj7799eil9oqgub1eeot8eap.apps.googleusercontent.com",
+              "client_id": "712176061851-2mbnaco56rfg4d1bl71anukv6bcrv95h.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.FantechLabs.editme"
+                "bundle_id": "Com.Editme.world"
               }
             }
           ]
