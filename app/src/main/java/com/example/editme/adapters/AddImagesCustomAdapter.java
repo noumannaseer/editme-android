@@ -9,11 +9,14 @@ import com.example.editme.R;
 import com.example.editme.databinding.ListViewEditImagesBinding;
 import com.example.editme.databinding.ListViewOrderImagesBinding;
 import com.example.editme.model.EditImage;
+import com.example.editme.utils.AndroidUtil;
+import com.example.editme.utils.UIUtils;
 
 import java.util.List;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
+
 import lombok.NonNull;
 import lombok.val;
 
@@ -45,8 +48,7 @@ public class AddImagesCustomAdapter
 
     //**********************************************
     @Override
-    public int getItemViewType(int position)
-    {
+    public int getItemViewType(int position) {
         return position;
     }
     //**********************************************
@@ -54,8 +56,7 @@ public class AddImagesCustomAdapter
 
     //*******************************-***************
     @Override
-    public long getItemId(int position)
-    {
+    public long getItemId(int position) {
         return super.getItemId(position);
     }
     //**********************************************
@@ -86,19 +87,18 @@ public class AddImagesCustomAdapter
 
         if (item.isUploading() == 0 && mShowProgress == true)
             holder.mBinding.progressBar.setVisibility(View.VISIBLE);
-        else if (item.isUploading() == 1 && mShowProgress == true)
-        {
+        else if (item.isUploading() == 1 && mShowProgress == true) {
             holder.mBinding.progressBar.setVisibility(View.GONE);
             holder.mBinding.progressView.setVisibility(View.VISIBLE);
             holder.mBinding.uploadCompleted.setVisibility(View.VISIBLE);
-        }
-        else if (item.isUploading() == -1)
-        {
+        } else if (item.isUploading() == -1) {
             holder.mBinding.progressView.setVisibility(View.GONE);
         }
 
 
-        holder.mBinding.addImage.setImageDrawable(item.getImageDrawable(mActivity));
+//        holder.mBinding.addImage.setImageDrawable(item.getImageDrawable(mActivity));
+
+        UIUtils.loadImages(item.getImageIntentURI().toString(), holder.mBinding.addImage, AndroidUtil.getDrawable(R.drawable.splash));
         holder.mBinding.description.setText(item.getDescription());
 
         holder.mBinding.addImageMainView.setOnClickListener(view -> {
@@ -107,8 +107,7 @@ public class AddImagesCustomAdapter
         });
         if (!mShowDeleteIcon)
             holder.mBinding.remove.setVisibility(View.GONE);
-        else
-        {
+        else {
             holder.mBinding.remove.setVisibility(View.VISIBLE);
             holder.mBinding.remove.setOnClickListener(view -> {
                 if (mImageClickListener != null)

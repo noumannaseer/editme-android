@@ -1,5 +1,6 @@
 package com.example.editme.activities;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -58,43 +59,50 @@ public class RecoveryEmailActivity
     //**************************************************************
     {
         mEmail = mBinding.email.getText()
-                               .toString();
+                .toString();
 
 
-        if (TextUtils.isEmpty(mEmail))
-        {
+        if (TextUtils.isEmpty(mEmail)) {
             mBinding.email.setError(AndroidUtil.getString(R.string.required));
             return;
         }
 
-        if (!UIUtils.isValidEmailId(mEmail))
-        {
+        if (!UIUtils.isValidEmailId(mEmail)) {
             mBinding.email.setError(AndroidUtil.getString(R.string.email_format));
             return;
         }
         mBinding.progressView.setVisibility(View.VISIBLE);
         EditMe.instance()
-              .getMAuth()
-              .sendPasswordResetEmail(mEmail)
-              .addOnCompleteListener((Task<Void> task) ->
-                                     {
+                .getMAuth()
+                .sendPasswordResetEmail(mEmail)
+                .addOnCompleteListener((Task<Void> task) ->
+                {
 
-                                         mBinding.progressBar.setVisibility(View.GONE);
-                                         if (task.isSuccessful())
-                                         {
-                                             UIUtils.displayAlertDialog(
-                                                     AndroidUtil.getString(
-                                                             R.string.email_sent), null,
-                                                     RecoveryEmailActivity.this);
-                                             super.onBackPressed();
+                    mBinding.progressBar.setVisibility(View.GONE);
+                    if (task.isSuccessful()) {
+                        UIUtils.displayAlertDialog(
+                                AndroidUtil.getString(
+                                        R.string.email_sent), null,
+                                RecoveryEmailActivity.this, AndroidUtil.getString(R.string.ok),
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        RecoveryEmailActivity.super.onBackPressed();
 
-                                         }
-                                         else
-                                             UIUtils.displayAlertDialog(task.getException()
-                                                                            .getLocalizedMessage(),
-                                                                        null,
-                                                                        RecoveryEmailActivity.this);
-                                     });
+                                    }
+                                });
+
+                    } else
+                        UIUtils.displayAlertDialog(task.getException()
+                                        .getLocalizedMessage(),
+                                null,
+                                RecoveryEmailActivity.this, AndroidUtil.getString(R.string.ok), new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                });
+                });
     }
 
     //******************************************************************
@@ -110,13 +118,12 @@ public class RecoveryEmailActivity
     public boolean onOptionsItemSelected(MenuItem item)
     //**************************************************************
     {
-        switch (item.getItemId())
-        {
-        case android.R.id.home:
-            super.onBackPressed();
-            return true;
-        default:
-            return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                super.onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }

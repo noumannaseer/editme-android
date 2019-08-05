@@ -41,6 +41,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
+
 import lombok.NonNull;
 import lombok.val;
 
@@ -109,36 +111,34 @@ public class PackagesActivity
 
         mBinding.packagesPrice.setOnClickListener(view -> {
             requestPayment(getWindow().getDecorView()
-                                      .getRootView());
+                    .getRootView());
             UIUtils.setPackageStatus(true);
         });
     }
 
-    private void getPackagesList()
-    {
+    private void getPackagesList() {
         showProgressView();
 
         EditMe.instance()
-              .getMFireStore()
-              .collection(Constants.PACKAGES)
-              .get()
-              .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>()
-              {
-                  @Override
-                  public void onSuccess(QuerySnapshot queryDocumentSnapshots)
-                  {
+                .getMFireStore()
+                .collection(Constants.PACKAGES)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                      mPackagesList = new ArrayList<PackagesDetails>();
-                      for (val child : queryDocumentSnapshots.getDocuments())
-                      {
-                          PackagesDetails packagesDetails = child.toObject(PackagesDetails.class);
-                          mPackagesList.add(packagesDetails);
-                      }
-                      hideProgressView();
-                      showDataOnRecyclerView();
-                  }
+                        mPackagesList = new ArrayList<PackagesDetails>();
+                        for (val child : queryDocumentSnapshots.getDocuments()) {
+                            PackagesDetails packagesDetails = child.toObject(PackagesDetails.class);
+                            mPackagesList.add(packagesDetails);
+                        }
 
-              });
+                        Collections.sort(mPackagesList, (obj1, obj2) -> ((int) obj1.getPrice() - (int) obj2.getPrice()));
+                        hideProgressView();
+                        showDataOnRecyclerView();
+                    }
+
+                });
 
     }
 
@@ -149,8 +149,8 @@ public class PackagesActivity
     {
 
         CircularImageSliderAdapter adapter = new CircularImageSliderAdapter(mPackagesList,
-                                                                            this,
-                                                                            this);
+                this,
+                this);
         mBinding.horizontalCycle.setAdapter(adapter);
     }
 
@@ -167,33 +167,17 @@ public class PackagesActivity
     }
 
     @Override
-    public void onPurchaseClick(int position)
-    {
+    public void onPurchaseClick(int position) {
 
-        Map<String, Object> update = new HashMap<>();
-        update.put("currentPackage", mPackagesList.get(position));
+        gotoPaymentCardActivity(position);
+        finish();
 
+    }
 
-        EditMe.instance()
-              .getMFireStore()
-              .collection(Constants.Users)
-              .document(EditMe.instance()
-                              .getMUserId())
-              .update(update)
-              .addOnSuccessListener(new OnSuccessListener<Void>()
-              {
-                  @Override
-                  public void onSuccess(Void aVoid)
-                  {
-                      AndroidUtil.toast(false,
-                                        AndroidUtil.getString(R.string.package_buy_successfully));
-                      finish();
-                  }
-              });
-       /* requestPayment(getWindow().getDecorView()
-                                  .getRootView());*/
-        UIUtils.setPackageStatus(true);
-
+    private void gotoPaymentCardActivity(int position) {
+        Intent paymentCardIntent = new Intent(this, PaymentCardActivity.class);
+        paymentCardIntent.putExtra(PaymentCardActivity.CURRENT_PACKAGE, mPackagesList.get(position));
+        startActivity(paymentCardIntent);
     }
 
 
@@ -212,8 +196,7 @@ public class PackagesActivity
     public boolean onOptionsItemSelected(MenuItem item)
     //******************************************************************
     {
-        if (item.getItemId() == android.R.id.home)
-        {
+        if (item.getItemId() == android.R.id.home) {
             super.onBackPressed();
         }
         return super.onOptionsItemSelected(item);
@@ -233,19 +216,17 @@ public class PackagesActivity
 
         // TransactionInfo transaction = PaymentsUtil.createTransaction(price);
         Optional<JSONObject> paymentDataRequestJson = PaymentsUtil.getPaymentDataRequest(price);
-        if (!paymentDataRequestJson.isPresent())
-        {
+        if (!paymentDataRequestJson.isPresent()) {
             return;
         }
         PaymentDataRequest request =
                 PaymentDataRequest.fromJson(paymentDataRequestJson.get()
-                                                                  .toString());
+                        .toString());
 
         // Since loadPaymentData may show the UI asking the user to select a payment method, we use
         // AutoResolveHelper to wait for the user interacting with it. Once completed,
         // onActivityResult will be called with the result.
-        if (request != null)
-        {
+        if (request != null) {
             AutoResolveHelper.resolveTask(
                     mPaymentsClient.loadPaymentData(request), this, LOAD_PAYMENT_DATA_REQUEST_CODE);
         }
@@ -273,14 +254,12 @@ public class PackagesActivity
     //**********************************************************************
     {
         final Optional<JSONObject> isReadyToPayJson = PaymentsUtil.getIsReadyToPayRequest();
-        if (!isReadyToPayJson.isPresent())
-        {
+        if (!isReadyToPayJson.isPresent()) {
             return;
         }
         IsReadyToPayRequest request = IsReadyToPayRequest.fromJson(isReadyToPayJson.get()
-                                                                                   .toString());
-        if (request == null)
-        {
+                .toString());
+        if (request == null) {
             return;
         }
 
@@ -288,24 +267,19 @@ public class PackagesActivity
         // OnCompleteListener to be triggered when the result of the call is known.
         Task<Boolean> task = mPaymentsClient.isReadyToPay(request);
         task.addOnCompleteListener(this,
-                                   new OnCompleteListener<Boolean>()
-                                   {
-                                       @Override
-                                       public void onComplete(@NonNull Task<Boolean> task)
-                                       {
-                                           if (task.isSuccessful())
-                                           {
-                                               AndroidUtil.toast(false, AndroidUtil.getString(
-                                                       R.string.google_pay_is_available));
-                                           }
-                                           else
-                                           {
-                                               Log.w(AndroidUtil.getString(
-                                                       R.string.is_ready_to_pay_failed),
-                                                     task.getException());
-                                           }
-                                       }
-                                   });
+                new OnCompleteListener<Boolean>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Boolean> task) {
+                        if (task.isSuccessful()) {
+                            AndroidUtil.toast(false, AndroidUtil.getString(
+                                    R.string.google_pay_is_available));
+                        } else {
+                            Log.w(AndroidUtil.getString(
+                                    R.string.is_ready_to_pay_failed),
+                                    task.getException());
+                        }
+                    }
+                });
     }
 
 
@@ -314,30 +288,28 @@ public class PackagesActivity
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     //**********************************************************************
     {
-        switch (requestCode)
-        {
-        // value passed in AutoResolveHelper
-        case LOAD_PAYMENT_DATA_REQUEST_CODE:
-            switch (resultCode)
-            {
-            case Activity.RESULT_OK:
-                PaymentData paymentData = PaymentData.getFromIntent(data);
-                handlePaymentSuccess(paymentData);
-                break;
-            case Activity.RESULT_CANCELED:
-                // Nothing to here normally - the user simply cancelled without selecting a
-                // payment method.
-                break;
-            case AutoResolveHelper.RESULT_ERROR:
-                Status status = AutoResolveHelper.getStatusFromIntent(data);
-                handleError(status.getStatusCode());
-                break;
-            default:
-                // Do nothing.
-            }
+        switch (requestCode) {
+            // value passed in AutoResolveHelper
+            case LOAD_PAYMENT_DATA_REQUEST_CODE:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        PaymentData paymentData = PaymentData.getFromIntent(data);
+                        handlePaymentSuccess(paymentData);
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        // Nothing to here normally - the user simply cancelled without selecting a
+                        // payment method.
+                        break;
+                    case AutoResolveHelper.RESULT_ERROR:
+                        Status status = AutoResolveHelper.getStatusFromIntent(data);
+                        handleError(status.getStatusCode());
+                        break;
+                    default:
+                        // Do nothing.
+                }
 
-            // Re-enables the Google Pay payment button.
-            break;
+                // Re-enables the Google Pay payment button.
+                break;
         }
     }
 
@@ -348,14 +320,12 @@ public class PackagesActivity
         String paymentInformation = paymentData.toJson();
 
         // Token will be null if PaymentDataRequest was not constructed using fromJson(String).
-        if (paymentInformation == null)
-        {
+        if (paymentInformation == null) {
             return;
         }
         JSONObject paymentMethodData;
 
-        try
-        {
+        try {
             paymentMethodData = new JSONObject(paymentInformation).getJSONObject(
                     "paymentMethodData");
             // If the gateway is set to "example", no payment information is returned - instead, the
@@ -367,8 +337,7 @@ public class PackagesActivity
                     && paymentMethodData
                     .getJSONObject("tokenizationData")
                     .getString("token")
-                    .equals("examplePaymentMethodToken"))
-            {
+                    .equals("examplePaymentMethodToken")) {
                 AlertDialog alertDialog =
                         new AlertDialog.Builder(this)
                                 .setTitle("Warning")
@@ -382,19 +351,17 @@ public class PackagesActivity
 
             String billingName =
                     paymentMethodData.getJSONObject("info")
-                                     .getJSONObject("billingAddress")
-                                     .getString("name");
+                            .getJSONObject("billingAddress")
+                            .getString("name");
             Log.d("BillingName", billingName);
             Toast.makeText(this, getString(R.string.payments_show_name, billingName),
-                           Toast.LENGTH_LONG)
-                 .show();
+                    Toast.LENGTH_LONG)
+                    .show();
 
             // Logging token string.
             Log.d("GooglePaymentToken", paymentMethodData.getJSONObject("tokenizationData")
-                                                         .getString("token"));
-        }
-        catch (JSONException e)
-        {
+                    .getString("token"));
+        } catch (JSONException e) {
             Log.e("handlePaymentSuccess", "Error: " + e.toString());
             return;
         }

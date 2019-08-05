@@ -8,6 +8,7 @@ import com.example.editme.EditMe;
 import com.example.editme.R;
 import com.example.editme.fragments.HomeFragment;
 import com.example.editme.utils.AndroidUtil;
+import com.example.editme.utils.UIUtils;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -34,7 +35,8 @@ public class SplashActivity
     {
 
 
-        //gotoWelcomeScreen();
+        gotoWelcomeScreen();
+        UIUtils.printKeyHash(SplashActivity.this);
 
     }
 

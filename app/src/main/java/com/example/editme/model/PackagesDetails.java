@@ -42,7 +42,7 @@ public class PackagesDetails
     {
         packageName = in.readString();
         packageDescription = in.readString();
-        price = in.readFloat();
+        price = in.readDouble();
         totalImages = in.readInt();
         remainingImages = in.readInt();
     }

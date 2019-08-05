@@ -4,6 +4,10 @@
 
     <string name="facebook_app_id">672878816484469</string>
     <string name="fb_login_protocol_scheme">fb672878816484469</string>
+
+    <!--<string name="facebook_app_id">906633546380452</string>-->
+    <!--<string name="fb_login_protocol_scheme">fb906633546380452</string>-->
+
     <string name="error">Error</string>
     <string name="ok">@android:string/ok</string>
     <string name="double_the_pleasure_double_the_place_you_order">Double the Pleasure,Double the Place you order</string>
@@ -173,5 +177,11 @@
     <string name="select_file">Select file</string>
     <string name="change_number">Change number</string>
     <string name="total_images_template">Out of %1$d</string>
+    <string name="internet_is_not_available">Internet not available</string>
+    <string name="card_is_invalid">Card is invalid</string>
+    <string name="pay_now">Pay now</string>
+    <string name="payed_sussfully">Payed successfully</string>
+    <string name="payment">Payment</string>
+    <string name="please_wait_nyour_payment_is_processing">Please Wait\nyour payment is Processing</string>
 
 </resources>

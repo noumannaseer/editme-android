@@ -31,4 +31,7 @@ public class Constants
     public static final CharSequence VERBOSE_NOTIFICATION_CHANNEL_NAME = "Verbose WorkManager Notifications";
     public static final int NOTIFICATION_ID = 1;
 
+
+    //Cloud Function
+    public static final String FUNCTION_CHARGE_AMOUNT = "chargeAmount";
 }
