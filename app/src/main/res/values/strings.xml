@@ -174,4 +174,7 @@
     <string name="change_number">Change number</string>
     <string name="total_images_template">Out of %1$d</string>
 
+    <string name="pay_now">Pay now</string>
+    <string name="please_wait_nyour_payment_is_processing">Please Wait\nyour payment is Processing</string>
+
 </resources>
