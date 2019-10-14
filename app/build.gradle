@@ -63,6 +63,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:17.0.0'
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
     implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
+    implementation "com.github.AppIntro:AppIntro:5.1.0"
+
 
 
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
@@ -89,7 +91,6 @@ dependencies {
 
 
     // Google play services for location information
-
 
 
 }

@@ -16,9 +16,13 @@
 
 
     <color name="light_grey">#F1F9FF</color>
+    <color name="white">#F1F9FF</color>
+
     <color name="medium_grey">#78849e</color>
     <color name="black_color">#454f63</color>
     <color name="edit_me_grey">#EEEFF0</color>
     <color name="edit_me_green">#47FB83</color>
+    <color name="toolbar_text_color">@android:color/black</color>
+    <color name="toolbar_text_color_transparent">@android:color/transparent</color>
 
 </resources>
