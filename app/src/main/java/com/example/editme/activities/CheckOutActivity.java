@@ -29,6 +29,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.StorageReference;
 
 import java.text.ParseException;
@@ -252,32 +253,54 @@ public class CheckOutActivity
                               if (task.isSuccessful())
                               {
 
-                                  val packagesDetails = EditMe.instance()
-                                                              .getMUserDetail()
-                                                              .getCurrentPackage();
-                                  packagesDetails.decrement(mEditImageList.size());
-                                  val userId = EditMe.instance()
-                                                     .getMUserId();
 
-                                  EditMe.instance()
-                                        .getMFireStore()
-                                        .collection(Constants.Users)
-                                        .document(userId)
-                                        .update("currentPackage.remainingImages",
-                                                FieldValue.increment(-mEditImageList.size()))
-                                        .addOnCompleteListener(
-                                                new OnCompleteListener<Void>()
-                                                {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task)
-                                                    {
-
-                                                        UIUtils.testToast(false, "Order posted");
-                                                        gotoBack();
-                                                    }
-                                                });
+                                  if (EditMe.instance()
+                                            .getMUserDetail()
+                                            .getCurrentPackage()
+                                            .getRemainingImages() - mEditImageList.size() == 0)
+                                  {
+                                      EditMe.instance()
+                                            .getMUserDetail()
+                                            .getCurrentPackage()
+                                            .setRemainingImages(0);
+                                      updateFirebase("currentPackage",
+                                                     null);
+                                  }
+                                  else
+                                  {
+                                      EditMe.instance()
+                                            .getMUserDetail()
+                                            .getCurrentPackage()
+                                            .setRemainingImages(EditMe.instance()
+                                                                      .getMUserDetail()
+                                                                      .getCurrentPackage()
+                                                                      .getRemainingImages() - mEditImageList.size());
+                                      updateFirebase("currentPackage.remainingImages",
+                                                     FieldValue.increment(-mEditImageList.size()));
+                                  }
 
                               }
+                          }
+                      });
+    }
+
+    private void updateFirebase(String field, FieldValue s1)
+    {
+        EditMe.instance()
+              .getMFireStore()
+              .collection(Constants.Users)
+              .document(EditMe.instance()
+                              .getMUserId())
+              .update(field, s1)
+              .addOnCompleteListener(
+                      new OnCompleteListener<Void>()
+                      {
+                          @Override
+                          public void onComplete(@NonNull Task<Void> task)
+                          {
+
+                              UIUtils.testToast(false, "Order posted");
+                              gotoBack();
                           }
                       });
     }

@@ -4,15 +4,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
-import lombok.NonNull;
 import lombok.val;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.BoringLayout;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -25,9 +22,6 @@ import com.example.editme.utils.UIUtils;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserInfo;
 
@@ -80,6 +74,8 @@ public class SettingsActivity
         mBinding.userNameLayout.setOnClickListener(view -> gotoUpdateNameScreen(false));
         mBinding.emailLayout.setOnClickListener(view -> gotoUpdateNameScreen(true));
         mBinding.changePasswordLayout.setOnClickListener(view -> gotoUpdatePasswordScreen());
+        mBinding.howToUse.setOnClickListener(view -> gotoVisitScreen());
+
         mBinding.paymentsLayout.setOnClickListener(view -> {
 
             if (EditMe.instance()
@@ -92,6 +88,12 @@ public class SettingsActivity
         });
         mBinding.logoutLayout.setOnClickListener(view -> logoutUser());
 
+    }
+
+    private void gotoVisitScreen()
+    {
+        Intent introWizardIntent = new Intent(this, IntroSliderActivity.class);
+        startActivity(introWizardIntent);
     }
 
     private void gotoCurrentPackageScree()
