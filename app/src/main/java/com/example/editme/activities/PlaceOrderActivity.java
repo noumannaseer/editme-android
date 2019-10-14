@@ -82,6 +82,7 @@ public class PlaceOrderActivity
     public static String SHARED_MULTIPLE_IMAGE_URI = "SHARED_MULTIPLE_IMAGE_URI";
     private Date mDueDate;
     private String mDueDateString;
+    private int remainingImgs;
 
     //******************************************************************
     @Override
@@ -111,8 +112,13 @@ public class PlaceOrderActivity
     //******************************************************************
     {
         setTab();
+        remainingImgs = EditMe.instance()
+                              .getMUserDetail()
+                              .getCurrentPackage()
+                              .getRemainingImages();
         getParcelable();
-        mBinding.addImage.setOnClickListener(view -> pickFromGallery());
+        mBinding.addImage.setOnClickListener(view ->
+                                                     pickFromGallery());
         mBinding.orderDescription.clearFocus();
         if (!mIsUpdate)
             mBinding.deliverDate.setOnClickListener(view -> showCalendar(mBinding.deliverDate));
@@ -429,46 +435,55 @@ public class PlaceOrderActivity
     private void pickFromGallery()
     //**************************************************************
     {
-        final CharSequence[] items = { AndroidUtil.getString(
-                R.string.camera), AndroidUtil.getString(R.string.gallery),
-                AndroidUtil.getString(R.string.cancel) };
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setItems(items, new DialogInterface.OnClickListener()
+        if (remainingImgs - mEditImages.size() > 0)
         {
-            @Override
-            public void onClick(DialogInterface dialog, int which)
+            final CharSequence[] items = { AndroidUtil.getString(
+                    R.string.camera), AndroidUtil.getString(R.string.gallery),
+                    AndroidUtil.getString(R.string.cancel) };
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setItems(items, new DialogInterface.OnClickListener()
             {
-                if (items[which] == AndroidUtil.getString(R.string.camera))
+                @Override
+                public void onClick(DialogInterface dialog, int which)
                 {
-                    showImageDialog();
-                }
-                else if (items[which] == AndroidUtil.getString(R.string.gallery))
-                {
-                    if (!checkPermission())
+                    if (items[which] == AndroidUtil.getString(R.string.camera))
                     {
-                        ActivityCompat.requestPermissions(PlaceOrderActivity.this,
-                                                          new String[] { READ_EXTERNAL_STORAGE },
-                                                          PERMISSION_READ_EXTERNAl_REQUEST_CODE);
-                        return;
+                        showImageDialog();
                     }
-                    Intent intent = new Intent(Intent.ACTION_PICK,
-                                               MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    intent.setType("image/*");
-                    String[] mimeTypes = { "image/jpeg", "image/png" };
-                    intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
-                    startActivityForResult(intent.createChooser(intent, AndroidUtil.getString(
-                            R.string.select_file)),
-                                           GALLERY_REQUEST_CODE);
+                    else if (items[which] == AndroidUtil.getString(R.string.gallery))
+                    {
+                        if (!checkPermission())
+                        {
+                            ActivityCompat.requestPermissions(PlaceOrderActivity.this,
+                                                              new String[] { READ_EXTERNAL_STORAGE },
+                                                              PERMISSION_READ_EXTERNAl_REQUEST_CODE);
+                            return;
+                        }
+                        Intent intent = new Intent(Intent.ACTION_PICK,
+                                                   MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        intent.setType("image/*");
+                        String[] mimeTypes = { "image/jpeg", "image/png" };
+                        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+                        startActivityForResult(intent.createChooser(intent, AndroidUtil.getString(
+                                R.string.select_file)),
+                                               GALLERY_REQUEST_CODE);
+
+                    }
+                    else
+                        dialog.dismiss();
 
                 }
-                else
-                    dialog.dismiss();
+            });
 
-            }
-        });
-
-        builder.show();
-
+            builder.show();
+        }
+        else
+        {
+            UIUtils.displayAlertDialog(AndroidUtil.getString(R.string.limit_over),
+                                       AndroidUtil.getString(R.string.limit),
+                                       PlaceOrderActivity.this, AndroidUtil.getString(R.string.ok),
+                                       null);
+        }
     }
 
     //**********************************************

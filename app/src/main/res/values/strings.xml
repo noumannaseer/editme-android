@@ -183,7 +183,13 @@
     <string name="payed_sussfully">Payed successfully</string>
     <string name="payment">Payment</string>
     <string name="please_wait_nyour_payment_is_processing">Please Wait\nyour payment is Processing</string>
-
+    <string name="done">Next</string>
+    <string name="intro1_title">Take your image</string>
+    <string name="intro2_title">Upload your image</string>
+    <string name="intro3_title">Download your edited image</string>
+    <string name="limit_over">Your Limit is over</string>
+    <string name="limit">Limit</string>
+    <string name="Use">How to use</string>
 
 
 </resources>
